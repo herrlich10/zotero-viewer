@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Zotero References</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <script>
+        function validateSelection() {
+            const checked = document.querySelectorAll('input[name="selected_items"]:checked');
+            console.log("Selected checkboxes:", checked);
+            console.log("Number of selected items:", checked.length);
+            
+            // Log the values of selected checkboxes
+            const selectedValues = Array.from(checked).map(checkbox => checkbox.value);
+            console.log("Selected values:", selectedValues);
+            
+            if (checked.length === 0) {
+                alert('Please select at least one item');
+                return false;
+            }
+            
+            // Add a hidden field with selected values for debugging
+            const form = document.querySelector('.bulk-tag-form');
+            const debugField = document.createElement('input');
+            debugField.type = 'hidden';
+            debugField.name = 'debug_selected';
+            debugField.value = JSON.stringify(selectedValues);
+            form.appendChild(debugField);
+            
+            return true;
+        }
+    </script>
+</head>
+<body>
+    <!-- Add flash messages display at the top of the template -->
+    <div class="flash-messages">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+
+    <div class="container">
+        <div class="sidebar">
+            <h2>Available Tags</h2>
+            
+            <!-- 添加标签过滤和排序控件 -->
+            <div class="tag-controls">
+                <input type="text" id="tag-filter" placeholder="过滤标签..." class="tag-filter">
+                <select id="tag-sort" class="tag-sort">
+                    <option value="alpha">按字母排序</option>
+                    <option value="count" selected>按数量排序</option>
+                </select>
+            </div>
+            
+            <!-- 添加可滚动的标签云容器 -->
+            <div class="tag-cloud-container">
+                <div id="tag-cloud">
+                    {% for tag, count in tag_counts.items() %}
+                        <div class="tag {% if tag in selected_tags %}selected-tag{% endif %}"
+                             onclick="toggleTag('{{ tag }}')"
+                             data-count="{{ count }}">
+                            {{ tag }} ({{ count }})
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- 其余内容保持不变 -->
+        <div class="main-content">
+            <div class="filter-controls">
+                {% if selected_tags %}
+                    <button class="clear-filter" onclick="window.location.href='/'">
+                        ✕ Clear All Filters
+                    </button>
+                    <div>
+                        Active filters: 
+                        {% for tag in selected_tags %}
+                            <span class="tag selected-tag" onclick="toggleTag('{{ tag }}')">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+
+            <!-- Add this to templates/index.html after the filter controls -->
+            <!-- Make sure your form has these attributes -->
+            <form method="post" onsubmit="return validateSelection()" class="bulk-tag-form">
+                <div class="bulk-controls">
+                    <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
+                    <button type="submit" class="add-tag-button">
+                        Add Tags to Selected
+                    </button>
+                </div>
+                
+                <h2>References ({{ items|length }})</h2>
+                {% if items %}
+                    {% for item in items %}
+                        <div class="item">
+                            <!-- Ensure checkbox has correct name and value -->
+                            <input type="checkbox" 
+                                name="selected_items" 
+                                value="{{ item.id }}"
+                                id="item_{{ item.id }}">
+                            <div class="item-title"><strong>{{ item.title }}</strong></div>
+                            <div class="item-author">{{ item.author }}</div>
+                            <div class="item-date">{{ item.date }}</div>
+                            <div class="item-tags">
+                                Tags: 
+                                {% for tag in item.tags %}
+                                    <span class="tag">
+                                        {{ tag }}
+                                        <form method="POST" action="{{ url_for('remove_tag') }}" style="display: inline;">
+                                            <input type="hidden" name="tag_name" value="{{ tag }}">
+                                            <input type="hidden" name="item_id" value="{{ item.id }}">
+                                            <button type="submit" class="close-tag" title="Remove tag">&times;</button>
+                                        </form>
+                                    </span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                {% else %}
+                    <p>No items found matching the selected tags.</p>
+                {% endif %}
+            </form>
+        </div>
+    </div>
+
+    <script>
+        function toggleTag(tag) {
+            const currentTags = new URLSearchParams(window.location.search).getAll('tag');
+            const newTags = currentTags.includes(tag) 
+                ? currentTags.filter(t => t !== tag)
+                : [...currentTags, tag];
+            
+            const params = new URLSearchParams();
+            newTags.forEach(t => params.append('tag', t));
+            window.location.search = params.toString();
+        }
+    
+        // 添加标签过滤和排序功能
+        document.addEventListener('DOMContentLoaded', function() {
+            const tagFilter = document.getElementById('tag-filter');
+            const tagSort = document.getElementById('tag-sort');
+            const tagCloud = document.getElementById('tag-cloud');
+            const tags = Array.from(tagCloud.getElementsByClassName('tag'));
+            
+            // 过滤标签
+            tagFilter.addEventListener('input', function() {
+                const filterText = this.value.toLowerCase();
+                
+                tags.forEach(tag => {
+                    const tagText = tag.textContent.toLowerCase();
+                    if (tagText.includes(filterText)) {
+                        tag.style.display = '';
+                        // 高亮匹配部分
+                        if (filterText) {
+                            tag.classList.add('tag-highlight');
+                        } else {
+                            tag.classList.remove('tag-highlight');
+                        }
+                    } else {
+                        tag.style.display = 'none';
+                    }
+                });
+            });
+            
+            // 排序标签
+            tagSort.addEventListener('change', function() {
+                const sortMethod = this.value;
+                
+                tags.sort((a, b) => {
+                    if (sortMethod === 'alpha') {
+                        // 按字母排序
+                        return a.textContent.localeCompare(b.textContent);
+                    } else {
+                        // 按数量排序
+                        const countA = parseInt(a.getAttribute('data-count'));
+                        const countB = parseInt(b.getAttribute('data-count'));
+                        return countB - countA; // 降序
+                    }
+                });
+                
+                // 重新添加排序后的标签
+                tags.forEach(tag => {
+                    tagCloud.appendChild(tag);
+                });
+            });
+            
+            // 初始化排序
+            tagSort.dispatchEvent(new Event('change'));
+        });
+    </script>
+</body>
+</html>
