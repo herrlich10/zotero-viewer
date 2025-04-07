@@ -286,7 +286,7 @@ function initializeTagFilterAndSort() {
 }
 
 // Initialize everything when the DOM is loaded
-// Add this function to handle the select all checkbox functionality
+// Function to handle the select all checkbox functionality
 function initializeSelectAllCheckbox() {
     const selectAllCheckbox = document.getElementById('select-all-checkbox');
     const itemCheckboxes = document.querySelectorAll('input[name="selected_items"]');
@@ -312,23 +312,31 @@ function initializeSelectAllCheckbox() {
         }
     }
     
-    // Add event listener to select all checkbox
-    selectAllCheckbox.addEventListener('change', function() {
-        const newState = this.checked;
+    // Replace click with mousedown event which happens before the checkbox state changes
+    selectAllCheckbox.addEventListener('mousedown', function() {
+        // Determine what action to take based on current state
+        const shouldCheck = !this.checked && !this.indeterminate;
         
         // Set all checkboxes to the new state
         itemCheckboxes.forEach(checkbox => {
-            checkbox.checked = newState;
+            checkbox.checked = shouldCheck;
         });
         
-        // Update common tags display
-        updateCommonTags();
+        // Set the select-all checkbox state
+        setTimeout(() => {
+            this.checked = shouldCheck;
+            this.indeterminate = false;
+            
+            // Update common tags display
+            updateCommonTags();
+        }, 0);
     });
     
     // Add event listeners to individual checkboxes
     itemCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             updateSelectAllCheckbox();
+            // No need to call updateCommonTags here as it's already attached to checkboxes
         });
     });
     
