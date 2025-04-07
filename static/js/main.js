@@ -286,6 +286,57 @@ function initializeTagFilterAndSort() {
 }
 
 // Initialize everything when the DOM is loaded
+// Add this function to handle the select all checkbox functionality
+function initializeSelectAllCheckbox() {
+    const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const itemCheckboxes = document.querySelectorAll('input[name="selected_items"]');
+    
+    if (!selectAllCheckbox || itemCheckboxes.length === 0) return;
+    
+    // Update select all checkbox state based on item checkboxes
+    function updateSelectAllCheckbox() {
+        const checkedCount = document.querySelectorAll('input[name="selected_items"]:checked').length;
+        
+        if (checkedCount === 0) {
+            // None selected
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedCount === itemCheckboxes.length) {
+            // All selected
+            selectAllCheckbox.checked = true;
+            selectAllCheckbox.indeterminate = false;
+        } else {
+            // Some selected
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = true;
+        }
+    }
+    
+    // Add event listener to select all checkbox
+    selectAllCheckbox.addEventListener('change', function() {
+        const newState = this.checked;
+        
+        // Set all checkboxes to the new state
+        itemCheckboxes.forEach(checkbox => {
+            checkbox.checked = newState;
+        });
+        
+        // Update common tags display
+        updateCommonTags();
+    });
+    
+    // Add event listeners to individual checkboxes
+    itemCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', function() {
+            updateSelectAllCheckbox();
+        });
+    });
+    
+    // Initialize the state
+    updateSelectAllCheckbox();
+}
+
+// Update the DOMContentLoaded event handler to include the new function
 document.addEventListener('DOMContentLoaded', function() {
     initializeTagFilterAndSort();
     
@@ -293,6 +344,9 @@ document.addEventListener('DOMContentLoaded', function() {
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateCommonTags);
     });
+    
+    // Initialize select all checkbox
+    initializeSelectAllCheckbox();
 });
 
 

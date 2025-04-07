@@ -249,3 +249,18 @@ input[type="text"] {
     background-color: #ffffc0;
     border-color: #e6e600;
 }
+
+/* Add this to your existing CSS */
+.select-all-container {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+}
+
+.select-all-container input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.select-all-container label {
+    cursor: pointer;
+}
