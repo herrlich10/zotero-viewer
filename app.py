@@ -152,12 +152,6 @@ app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)  # Best pr
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
-        # Enhanced debugging
-        print("Form data keys:", list(request.form.keys()))
-        print("All form data:", dict(request.form))
-        print("Selected items:", request.form.getlist('selected_items'))
-        print("Debug selected:", request.form.get('debug_selected'))
-        
         new_tags_input = request.form.get('new_tag', '').strip()
         if not new_tags_input:
             flash('Please enter at least one tag name', 'error')
@@ -169,22 +163,17 @@ def index():
         if not new_tags:
             flash('Please enter valid tag names', 'error')
             return redirect(url_for('index'))
-            
+        
+        # Get the form data directly from the request
+        form_data = request.form
+        selected_items = form_data.getlist('selected_items')
+        print("selected_items:", selected_items)
+        
         try:
-            # Try to get selected items directly
-            selected_items = [int(id) for id in request.form.getlist('selected_items')]
-            
-            # If that fails, try to parse from debug field
-            if not selected_items and request.form.get('debug_selected'):
-                import json
-                try:
-                    selected_items = [int(id) for id in json.loads(request.form.get('debug_selected'))]
-                except:
-                    pass
-                    
-            print("Processed selected items:", selected_items)
-        except ValueError as e:
-            flash(f'Invalid item selection: {str(e)}', 'error')
+            # Convert to integers
+            selected_items = [int(item_id) for item_id in selected_items]
+        except ValueError:
+            flash('Invalid item selection', 'error')
             return redirect(url_for('index'))
 
         if not selected_items:
@@ -192,10 +181,8 @@ def index():
             return redirect(url_for('index'))
         
         try:
-            # Process each tag separately - fix the parameter passing
+            # Process each tag separately
             for tag_name in new_tags:
-                # The first parameter is automatically injected by the decorator
-                # so we need to pass the actual parameters as the second and third arguments
                 add_tag_to_items(tag_name, selected_items)
             
             # Force reload all_items from database
@@ -216,6 +203,7 @@ def index():
         return redirect(url_for('index'))
     
     else:
+        # GET request handling remains unchanged
         selected_tags = request.args.getlist('tag')
         
         # Filter items that contain ALL selected tags

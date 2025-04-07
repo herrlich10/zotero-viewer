@@ -89,7 +89,7 @@
 
             <!-- Add this to templates/index.html after the filter controls -->
             <!-- Make sure your form has these attributes -->
-            <form method="post" onsubmit="return validateSelection()" class="bulk-tag-form">
+            <form method="post" enctype="multipart/form-data" onsubmit="return validateSelection()" class="bulk-tag-form">
                 <div class="bulk-controls">
                     <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
                     <button type="submit" class="add-tag-button">
@@ -106,6 +106,7 @@
                                 name="selected_items" 
                                 value="{{ item.id }}"
                                 id="item_{{ item.id }}">
+                            <!-- Replace the commented out item-tags div with this version -->
                             <div class="item-title"><strong>{{ item.title }}</strong></div>
                             <div class="item-author">{{ item.author }}</div>
                             <div class="item-date">{{ item.date }}</div>
@@ -114,11 +115,8 @@
                                 {% for tag in item.tags %}
                                     <span class="tag">
                                         {{ tag }}
-                                        <form method="POST" action="{{ url_for('remove_tag') }}" style="display: inline;">
-                                            <input type="hidden" name="tag_name" value="{{ tag }}">
-                                            <input type="hidden" name="item_id" value="{{ item.id }}">
-                                            <button type="submit" class="close-tag" title="Remove tag">&times;</button>
-                                        </form>
+                                        <button type="button" class="close-tag" title="Remove tag" 
+                                                onclick="removeTag('{{ tag }}', {{ item.id }})">&times;</button>
                                     </span>
                                 {% endfor %}
                             </div>
@@ -132,6 +130,34 @@
     </div>
 
     <script>
+        // Add this function to your existing script section
+        function removeTag(tagName, itemId) {
+            // Create a form dynamically
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('remove_tag') }}";
+            
+            // Add tag name input
+            const tagInput = document.createElement('input');
+            tagInput.type = 'hidden';
+            tagInput.name = 'tag_name';
+            tagInput.value = tagName;
+            form.appendChild(tagInput);
+            
+            // Add item id input
+            const itemInput = document.createElement('input');
+            itemInput.type = 'hidden';
+            itemInput.name = 'item_id';
+            itemInput.value = itemId;
+            form.appendChild(itemInput);
+            
+            // Add form to body, submit it, and remove it
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+        
+        // Your existing functions remain unchanged
         function toggleTag(tag) {
             const currentTags = new URLSearchParams(window.location.search).getAll('tag');
             const newTags = currentTags.includes(tag) 
