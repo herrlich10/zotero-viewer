@@ -144,7 +144,8 @@ def remove_tag_from_item(conn, tag_name, item_id):  # Accept conn as first param
     return True
 
 
-app = Flask(__name__)
+# Make sure this line is at the top of your app.py file
+app = Flask(__name__, static_folder='static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)  # Best practice
 
 # Update the route to handle POST with multiple tags
