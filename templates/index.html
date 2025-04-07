@@ -304,6 +304,15 @@
                 formData.append('item_ids', itemId);
             });
             
+            // Get current URL parameters to pass to the server
+            const currentUrl = new URL(window.location.href);
+            const selectedTags = currentUrl.searchParams.getAll('tag');
+            
+            // Add the current selected tags to the request
+            selectedTags.forEach(tag => {
+                formData.append('selected_tags', tag);
+            });
+            
             // Use fetch API with FormData
             fetch("{{ url_for('remove_tag_batch') }}", {
                 method: 'POST',

@@ -262,6 +262,7 @@ def remove_tag():
 def remove_tag_batch():
     tag_name = request.form.get('tag_name')
     item_ids = request.form.getlist('item_ids')
+    selected_tags = request.form.getlist('selected_tags')
     
     if not tag_name or not item_ids:
         return jsonify({
@@ -284,9 +285,6 @@ def remove_tag_batch():
         refresh_conn.row_factory = sqlite3.Row
         all_items = get_items_and_tags(refresh_conn)
         refresh_conn.close()
-        
-        # Get updated tag counts for the current filter
-        selected_tags = request.args.getlist('tag')
         
         # Filter items that contain ALL selected tags
         filtered_items = [
