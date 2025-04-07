@@ -226,6 +226,7 @@ def index():
         )
 
 # Add a new route to handle tag removal
+# Fix the remove_tag route
 @app.route('/remove_tag', methods=['POST'])
 def remove_tag():
     tag_name = request.form.get('tag_name')
@@ -237,7 +238,7 @@ def remove_tag():
     
     try:
         item_id = int(item_id)
-        # Fix parameter passing here too
+        # The decorated function will receive conn as first parameter
         success = remove_tag_from_item(tag_name, item_id)
         
         if success:
@@ -251,6 +252,44 @@ def remove_tag():
             flash(f'Removed tag "{tag_name}" from item', 'success')
         else:
             flash(f'Tag "{tag_name}" not found', 'error')
+    except Exception as e:
+        flash(f'Error removing tag: {str(e)}', 'error')
+    
+    # Redirect back to the current page with any existing filter parameters
+    return redirect(request.referrer or url_for('index'))
+
+# Add a new route to handle batch tag removal
+@app.route('/remove_tag_batch', methods=['POST'])
+def remove_tag_batch():
+    tag_name = request.form.get('tag_name')
+    item_ids = request.form.getlist('item_ids')
+    
+    if not tag_name or not item_ids:
+        flash('Missing tag name or item IDs', 'error')
+        return redirect(url_for('index'))
+    
+    try:
+        item_ids = [int(item_id) for item_id in item_ids]
+        success_count = 0
+        
+        # Process each item ID - the connection is handled by the decorator
+        for item_id in item_ids:
+            # Fixed: The remove_tag_from_item function is decorated with @with_transaction
+            # so we don't pass the connection directly
+            if remove_tag_from_item(tag_name, item_id):
+                success_count += 1
+        
+        # Force reload of all items data from the database
+        global all_items
+        refresh_conn = sqlite3.connect(database_path)
+        refresh_conn.row_factory = sqlite3.Row
+        all_items = get_items_and_tags(refresh_conn)
+        refresh_conn.close()
+        
+        if success_count > 0:
+            flash(f'Removed tag "{tag_name}" from {success_count} items', 'success')
+        else:
+            flash(f'Tag "{tag_name}" not found on selected items', 'error')
     except Exception as e:
         flash(f'Error removing tag: {str(e)}', 'error')
     

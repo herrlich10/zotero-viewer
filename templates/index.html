@@ -88,11 +88,18 @@
 
             <!-- Form remains unchanged -->
             <form method="post" enctype="multipart/form-data" onsubmit="return validateSelection()" class="bulk-tag-form">
+                <!-- Add this right after the bulk-controls div -->
                 <div class="bulk-controls">
                     <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
                     <button type="submit" class="add-tag-button">
                         Add Tags to Selected
                     </button>
+                </div>
+                
+                <!-- Add this new container for common tags -->
+                <div class="common-tags-container" id="common-tags-container" style="display: none;">
+                    <span class="common-tags-label">Common tags:</span>
+                    <div id="common-tags-list"></div>
                 </div>
                 
                 <h2>References ({{ items|length }})</h2>
@@ -218,6 +225,109 @@
             
             // 初始化排序
             tagSort.dispatchEvent(new Event('change'));
+        });
+    </script>
+    <script>
+        // Add this function to your existing script section
+        function updateCommonTags() {
+            const checked = document.querySelectorAll('input[name="selected_items"]:checked');
+            if (checked.length === 0) {
+                document.getElementById('common-tags-container').style.display = 'none';
+                return;
+            }
+            
+            // Get all selected item IDs
+            const selectedItemIds = Array.from(checked).map(checkbox => checkbox.value);
+            
+            // Find common tags among selected items
+            const allItemTags = {};
+            selectedItemIds.forEach(itemId => {
+                const item = document.getElementById(`item_${itemId}`).closest('.item');
+                const tagElements = item.querySelectorAll('.item-tags .tag');
+                
+                if (!allItemTags[itemId]) {
+                    allItemTags[itemId] = [];
+                }
+                
+                tagElements.forEach(tagEl => {
+                    // Get only the text content of the tag, excluding the close button
+                    const tagText = tagEl.childNodes[0].textContent.trim();
+                    allItemTags[itemId].push(tagText);
+                });
+            });
+            
+            // Find tags that exist in all selected items
+            let commonTags = [];
+            if (selectedItemIds.length > 0) {
+                commonTags = [...allItemTags[selectedItemIds[0]]];
+                for (let i = 1; i < selectedItemIds.length; i++) {
+                    commonTags = commonTags.filter(tag => 
+                        allItemTags[selectedItemIds[i]].includes(tag)
+                    );
+                }
+            }
+            
+            // Update the common tags display
+            const commonTagsContainer = document.getElementById('common-tags-container');
+            const commonTagsList = document.getElementById('common-tags-list');
+            
+            if (commonTags.length > 0) {
+                commonTagsContainer.style.display = 'flex';
+                commonTagsList.innerHTML = '';
+                
+                commonTags.forEach(tag => {
+                    const tagSpan = document.createElement('span');
+                    tagSpan.className = 'common-tag';
+                    tagSpan.innerHTML = `
+                        ${tag}
+                        <button type="button" class="remove-common-tag" 
+                                onclick="removeTagFromSelected('${tag}')">&times;</button>
+                    `;
+                    commonTagsList.appendChild(tagSpan);
+                });
+            } else {
+                commonTagsContainer.style.display = 'none';
+            }
+        }
+        
+        // Function to remove a tag from all selected items
+        function removeTagFromSelected(tagName) {
+            const checked = document.querySelectorAll('input[name="selected_items"]:checked');
+            const selectedItemIds = Array.from(checked).map(checkbox => checkbox.value);
+            
+            // Create a form to submit the batch removal
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = "{{ url_for('remove_tag_batch') }}";
+            
+            // Add tag name input
+            const tagInput = document.createElement('input');
+            tagInput.type = 'hidden';
+            tagInput.name = 'tag_name';
+            tagInput.value = tagName;
+            form.appendChild(tagInput);
+            
+            // Add all selected item IDs
+            selectedItemIds.forEach(itemId => {
+                const itemInput = document.createElement('input');
+                itemInput.type = 'hidden';
+                itemInput.name = 'item_ids';
+                itemInput.value = itemId;
+                form.appendChild(itemInput);
+            });
+            
+            // Add form to body, submit it, and remove it
+            document.body.appendChild(form);
+            form.submit();
+            document.body.removeChild(form);
+        }
+        
+        // Add event listeners to checkboxes to update common tags
+        document.addEventListener('DOMContentLoaded', function() {
+            const checkboxes = document.querySelectorAll('input[name="selected_items"]');
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener('change', updateCommonTags);
+            });
         });
     </script>
 </body>
