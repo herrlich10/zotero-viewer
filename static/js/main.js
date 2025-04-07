@@ -289,6 +289,7 @@ function initializeTagFilterAndSort() {
 // Function to handle the select all checkbox functionality
 function initializeSelectAllCheckbox() {
     const selectAllCheckbox = document.getElementById('select-all-checkbox');
+    const selectAllLabel = document.querySelector('label[for="select-all-checkbox"]');
     const itemCheckboxes = document.querySelectorAll('input[name="selected_items"]');
     
     if (!selectAllCheckbox || itemCheckboxes.length === 0) return;
@@ -312,10 +313,10 @@ function initializeSelectAllCheckbox() {
         }
     }
     
-    // Replace click with mousedown event which happens before the checkbox state changes
-    selectAllCheckbox.addEventListener('mousedown', function() {
+    // Function to toggle all checkboxes
+    function toggleAllCheckboxes() {
         // Determine what action to take based on current state
-        const shouldCheck = !this.checked && !this.indeterminate;
+        const shouldCheck = !selectAllCheckbox.checked && !selectAllCheckbox.indeterminate;
         
         // Set all checkboxes to the new state
         itemCheckboxes.forEach(checkbox => {
@@ -324,19 +325,32 @@ function initializeSelectAllCheckbox() {
         
         // Set the select-all checkbox state
         setTimeout(() => {
-            this.checked = shouldCheck;
-            this.indeterminate = false;
+            selectAllCheckbox.checked = shouldCheck;
+            selectAllCheckbox.indeterminate = false;
             
             // Update common tags display
             updateCommonTags();
         }, 0);
+    }
+    
+    // Add event listener to the checkbox
+    selectAllCheckbox.addEventListener('mousedown', function(e) {
+        toggleAllCheckboxes();
+        e.preventDefault(); // Prevent default to handle the state manually
     });
+    
+    // Add event listener to the label
+    if (selectAllLabel) {
+        selectAllLabel.addEventListener('click', function(e) {
+            toggleAllCheckboxes();
+            e.preventDefault(); // Prevent default to avoid triggering the checkbox's default behavior
+        });
+    }
     
     // Add event listeners to individual checkboxes
     itemCheckboxes.forEach(checkbox => {
         checkbox.addEventListener('change', function() {
             updateSelectAllCheckbox();
-            // No need to call updateCommonTags here as it's already attached to checkboxes
         });
     });
     
