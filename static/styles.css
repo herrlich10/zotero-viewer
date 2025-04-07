@@ -58,13 +58,24 @@
     align-items: center;
 }
 
+.clear-filter-container {
+    margin: 10px 0;
+    text-align: center;
+}
+
 .clear-filter {
-    padding: 8px 15px;
-    background: #dc3545;
+    background-color: #f44336;
     color: white;
     border: none;
-    border-radius: 5px;
+    padding: 5px 10px;
+    border-radius: 4px;
     cursor: pointer;
+    font-size: 0.9em;
+    width: 100%;
+}
+
+.clear-filter:hover {
+    background-color: #d32f2f;
 }
 
 .bulk-tag-form {
@@ -127,10 +138,17 @@ input[type="text"] {
 }
 
 /* 标签控件样式 */
+/* Adjust sidebar width to accommodate controls */
+.sidebar { 
+    width: 280px; /* Increased from 250px */
+}
+
+/* Tag controls style */
 .tag-controls {
     display: flex;
-    gap: 10px;
+    gap: 5px; /* Reduced from 10px */
     margin-bottom: 10px;
+    align-items: center;
 }
 
 .tag-filter {
@@ -138,13 +156,32 @@ input[type="text"] {
     padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
+    height: 36px;
+    box-sizing: border-box;
+    font-size: 0.9em; /* Slightly smaller font */
 }
 
 .tag-sort {
-    padding: 8px;
+    padding: 6px; /* Reduced padding */
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: white;
+    height: 36px;
+    box-sizing: border-box;
+    min-width: 110px; /* Slightly reduced width */
+    font-size: 0.9em; /* Slightly smaller font */
+}
+
+/* Ensure tag cloud container matches sidebar width */
+.tag-cloud-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    box-sizing: border-box; /* Include padding in width calculation */
+    width: 100%; /* Ensure it takes full width of sidebar */
 }
 
 /* 美化滚动条 */

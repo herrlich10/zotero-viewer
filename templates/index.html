@@ -48,16 +48,25 @@
         <div class="sidebar">
             <h2>Available Tags</h2>
             
-            <!-- 添加标签过滤和排序控件 -->
+            <!-- Tag filtering and sorting controls -->
             <div class="tag-controls">
-                <input type="text" id="tag-filter" placeholder="过滤标签..." class="tag-filter">
+                <input type="text" id="tag-filter" placeholder="Filter tags..." class="tag-filter">
                 <select id="tag-sort" class="tag-sort">
-                    <option value="alpha">按字母排序</option>
-                    <option value="count" selected>按数量排序</option>
+                    <option value="alpha">Sort alphabetically</option>
+                    <option value="count" selected>Sort by count</option>
                 </select>
             </div>
             
-            <!-- 添加可滚动的标签云容器 -->
+            <!-- Clear filters button moved here -->
+            {% if selected_tags %}
+            <div class="clear-filter-container">
+                <button class="clear-filter" onclick="window.location.href='/'">
+                    ✕ Clear All Filters
+                </button>
+            </div>
+            {% endif %}
+            
+            <!-- Scrollable tag cloud container -->
             <div class="tag-cloud-container">
                 <div id="tag-cloud">
                     {% for tag, count in tag_counts.items() %}
@@ -71,24 +80,13 @@
             </div>
         </div>
         
-        <!-- 其余内容保持不变 -->
+        <!-- Form remains unchanged -->
         <div class="main-content">
+            <!-- Empty filter controls div - Active filters section removed -->
             <div class="filter-controls">
-                {% if selected_tags %}
-                    <button class="clear-filter" onclick="window.location.href='/'">
-                        ✕ Clear All Filters
-                    </button>
-                    <div>
-                        Active filters: 
-                        {% for tag in selected_tags %}
-                            <span class="tag selected-tag" onclick="toggleTag('{{ tag }}')">{{ tag }}</span>
-                        {% endfor %}
-                    </div>
-                {% endif %}
             </div>
 
-            <!-- Add this to templates/index.html after the filter controls -->
-            <!-- Make sure your form has these attributes -->
+            <!-- Form remains unchanged -->
             <form method="post" enctype="multipart/form-data" onsubmit="return validateSelection()" class="bulk-tag-form">
                 <div class="bulk-controls">
                     <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
