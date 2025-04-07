@@ -90,11 +90,24 @@
 }
 
 /* Add styles for common tags display */
+/* Add these styles for the common tags container */
 .common-tags-container {
+    min-height: 40px;  /* Preallocate space for the container */
     margin-bottom: 15px;
     display: flex;
-    flex-wrap: wrap;
     align-items: center;
+    visibility: hidden; /* Use visibility instead of display to preserve space */
+}
+
+/* When the container is active, make it visible but keep the same space */
+.common-tags-container.active {
+    visibility: visible;
+}
+
+/* Style for the common tags list */
+#common-tags-list {
+    display: flex;
+    flex-wrap: wrap;
     gap: 5px;
 }
 

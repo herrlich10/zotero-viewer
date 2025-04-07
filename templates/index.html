@@ -98,18 +98,18 @@
                 </div>
                 
                 <!-- Add this new container for common tags -->
-                <div class="common-tags-container" id="common-tags-container" style="display: none;">
+                <div class="common-tags-container" id="common-tags-container">
                     <span class="common-tags-label">Common tags:</span>
                     <div id="common-tags-list"></div>
                 </div>
                 
                 <h2>References ({{ items|length }})</h2>
-                                <div class="select-all-container">
-                                    <input type="checkbox" id="select-all-checkbox">
-                                    <label for="select-all-checkbox">Select All</label>
-                                </div>
-                                {% if items %}
-                                    {% for item in items %}
+                <div class="select-all-container">
+                    <input type="checkbox" id="select-all-checkbox">
+                    <label for="select-all-checkbox">Select All</label>
+                </div>
+                {% if items %}
+                    {% for item in items %}
                         <div class="item">
                             <!-- Ensure checkbox has correct name and value -->
                             <input type="checkbox" 

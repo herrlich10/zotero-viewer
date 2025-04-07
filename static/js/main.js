@@ -20,10 +20,13 @@ function toggleTag(tagName) {
 }
 
 // Function to update common tags display
+// Function to update common tags display
 function updateCommonTags() {
     const checked = document.querySelectorAll('input[name="selected_items"]:checked');
+    const commonTagsContainer = document.getElementById('common-tags-container');
+    
     if (checked.length === 0) {
-        document.getElementById('common-tags-container').style.display = 'none';
+        commonTagsContainer.classList.remove('active');
         return;
     }
     
@@ -59,11 +62,10 @@ function updateCommonTags() {
     }
     
     // Update the common tags display
-    const commonTagsContainer = document.getElementById('common-tags-container');
     const commonTagsList = document.getElementById('common-tags-list');
     
     if (commonTags.length > 0) {
-        commonTagsContainer.style.display = 'flex';
+        commonTagsContainer.classList.add('active');
         commonTagsList.innerHTML = '';
         
         commonTags.forEach(tag => {
@@ -77,7 +79,7 @@ function updateCommonTags() {
             commonTagsList.appendChild(tagSpan);
         });
     } else {
-        commonTagsContainer.style.display = 'none';
+        commonTagsContainer.classList.remove('active');
     }
 }
 
@@ -313,37 +315,55 @@ function initializeSelectAllCheckbox() {
         }
     }
     
-    // Function to toggle all checkboxes
-    function toggleAllCheckboxes() {
-        // Determine what action to take based on current state
+    // Handle the checkbox click directly
+    selectAllCheckbox.addEventListener('click', function(e) {
+        // Explicitly register to this event and preventDefault here is critical 
+        // to prevent the default checkbox click behavior to sneak in after the mousedown event.
+        e.preventDefault();
+    });
+
+    // Handle the mousedown event which happens before the click event
+    selectAllCheckbox.addEventListener('mousedown', function(e) {
+        e.preventDefault();
+                
+        // Toggle based on current state
         const shouldCheck = !selectAllCheckbox.checked && !selectAllCheckbox.indeterminate;
         
-        // Set all checkboxes to the new state
+        // Update all checkboxes
         itemCheckboxes.forEach(checkbox => {
             checkbox.checked = shouldCheck;
         });
         
-        // Set the select-all checkbox state
-        setTimeout(() => {
-            selectAllCheckbox.checked = shouldCheck;
-            selectAllCheckbox.indeterminate = false;
-            
-            // Update common tags display
-            updateCommonTags();
-        }, 0);
-    }
-    
-    // Add event listener to the checkbox
-    selectAllCheckbox.addEventListener('mousedown', function(e) {
-        toggleAllCheckboxes();
-        e.preventDefault(); // Prevent default to handle the state manually
+        // Update the select-all checkbox state
+        selectAllCheckbox.checked = shouldCheck;
+        selectAllCheckbox.indeterminate = false;
+        
+        // Update common tags display
+        updateCommonTags();
     });
     
-    // Add event listener to the label
+    // Handle label click separately
     if (selectAllLabel) {
         selectAllLabel.addEventListener('click', function(e) {
-            toggleAllCheckboxes();
-            e.preventDefault(); // Prevent default to avoid triggering the checkbox's default behavior
+            // Only handle if clicking directly on the label (not the checkbox)
+            if (e.target !== selectAllCheckbox) {
+                e.preventDefault();
+                
+                // Toggle based on current state
+                const shouldCheck = !selectAllCheckbox.checked && !selectAllCheckbox.indeterminate;
+                
+                // Update all checkboxes
+                itemCheckboxes.forEach(checkbox => {
+                    checkbox.checked = shouldCheck;
+                });
+                
+                // Update the select-all checkbox state
+                selectAllCheckbox.checked = shouldCheck;
+                selectAllCheckbox.indeterminate = false;
+                
+                // Update common tags display
+                updateCommonTags();
+            }
         });
     }
     
