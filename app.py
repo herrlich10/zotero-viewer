@@ -1,9 +1,8 @@
 import sqlite3
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import sys, os
 import re  # Add this import for regex splitting
 from collections import defaultdict
-from flask import redirect, url_for, flash
 import functools
 
 # Connect to database
@@ -265,17 +264,17 @@ def remove_tag_batch():
     item_ids = request.form.getlist('item_ids')
     
     if not tag_name or not item_ids:
-        flash('Missing tag name or item IDs', 'error')
-        return redirect(url_for('index'))
+        return jsonify({
+            'success': False,
+            'message': 'Missing tag name or item IDs'
+        })
     
     try:
         item_ids = [int(item_id) for item_id in item_ids]
         success_count = 0
         
-        # Process each item ID - the connection is handled by the decorator
+        # Process each item ID
         for item_id in item_ids:
-            # Fixed: The remove_tag_from_item function is decorated with @with_transaction
-            # so we don't pass the connection directly
             if remove_tag_from_item(tag_name, item_id):
                 success_count += 1
         
@@ -286,12 +285,37 @@ def remove_tag_batch():
         all_items = get_items_and_tags(refresh_conn)
         refresh_conn.close()
         
+        # Get updated tag counts for the current filter
+        selected_tags = request.args.getlist('tag')
+        
+        # Filter items that contain ALL selected tags
+        filtered_items = [
+            item for item in all_items
+            if all(tag in item['tags'] for tag in selected_tags)
+        ] if selected_tags else all_items
+        
+        # Create tag cloud with counts for current selection
+        tag_counts = defaultdict(int)
+        for item in filtered_items:
+            for tag in item['tags']:
+                tag_counts[tag] += 1
+        
         if success_count > 0:
-            flash(f'Removed tag "{tag_name}" from {success_count} items', 'success')
+            return jsonify({
+                'success': True,
+                'message': f'Removed tag "{tag_name}" from {success_count} items',
+                'tag_counts': dict(tag_counts)
+            })
         else:
-            flash(f'Tag "{tag_name}" not found on selected items', 'error')
+            return jsonify({
+                'success': False,
+                'message': f'Tag "{tag_name}" not found on selected items'
+            })
     except Exception as e:
-        flash(f'Error removing tag: {str(e)}', 'error')
+        return jsonify({
+            'success': False,
+            'message': f'Error removing tag: {str(e)}'
+        })
     
     # Redirect back to the current page with any existing filter parameters
     return redirect(request.referrer or url_for('index'))
