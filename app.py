@@ -217,7 +217,7 @@ def remove_tag_from_item(conn, tag_name, item_id):  # Accept conn as first param
 app = Flask(__name__, static_folder='static')
 app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)  # Best practice
 
-# Update the route to handle POST with multiple tags
+# Update the route to handle POST with multiple tags and return JSON for AJAX requests
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -270,7 +270,19 @@ def index():
         except Exception as e:
             flash(f'Error: {str(e)}', 'error')
         return redirect(url_for('index'))
-    
+        
+        # Check if this is an AJAX request
+        is_ajax = request.headers.get('X-Requested-With') == 'XMLHttpRequest'
+        
+        # Return JSON response for AJAX requests
+        if is_ajax:
+            return jsonify({
+                'success': True,
+                'message': message,
+                'tag_counts': dict(tag_counts)
+            })
+        else:
+            return redirect(url_for('index'))
     else:
         # GET request handling remains unchanged
         selected_tags = request.args.getlist('tag')
@@ -613,6 +625,90 @@ def get_item_details(item_id):
         return jsonify({
             'success': False,
             'message': f'Error retrieving item details: {str(e)}'
+        })
+
+# Make sure to include the new JavaScript file in your template
+# Add this to the bottom of your index.html before the closing </body> tag:
+# <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
+
+# Add a new route specifically for AJAX tag addition
+@app.route('/add_tags', methods=['POST'])
+def add_tags():
+    new_tags_input = request.form.get('new_tag', '').strip()
+    selected_items = request.form.getlist('selected_items')
+    selected_tags = request.form.getlist('selected_tags')
+    
+    if not new_tags_input:
+        return jsonify({
+            'success': False,
+            'message': 'Please enter at least one tag name'
+        })
+    
+    # Split the input by comma or semicolon to get multiple tags
+    new_tags = [tag.strip() for tag in re.split(r'[,;]', new_tags_input) if tag.strip()]
+    
+    if not new_tags:
+        return jsonify({
+            'success': False,
+            'message': 'Please enter valid tag names'
+        })
+    
+    try:
+        # Convert to integers
+        selected_items = [int(item_id) for item_id in selected_items]
+    except ValueError:
+        return jsonify({
+            'success': False,
+            'message': 'Invalid item selection'
+        })
+
+    if not selected_items:
+        return jsonify({
+            'success': False,
+            'message': 'Please select at least one item'
+        })
+    
+    try:
+        # Process each tag separately
+        for tag_name in new_tags:
+            add_tag_to_items(tag_name=tag_name, item_ids=selected_items)
+        
+        # Force reload all_items from database
+        global all_items
+        refresh_conn = sqlite3.connect(database_path)
+        refresh_conn.row_factory = sqlite3.Row
+        all_items = get_items_and_tags(refresh_conn)
+        
+        # Filter items that contain ALL selected tags
+        filtered_items = [
+            item for item in all_items
+            if all(tag in item['tags'] for tag in selected_tags)
+        ] if selected_tags else all_items
+        
+        # Create tag cloud with counts for current selection
+        tag_counts = defaultdict(int)
+        for item in filtered_items:
+            for tag in item['tags']:
+                tag_counts[tag] += 1
+        
+        refresh_conn.close()
+        
+        # Create success message
+        if len(new_tags) == 1:
+            message = f'Added tag "{new_tags[0]}" to {len(selected_items)} items'
+        else:
+            message = f'Added {len(new_tags)} tags to {len(selected_items)} items'
+        
+        return jsonify({
+            'success': True,
+            'message': message,
+            'tag_counts': dict(tag_counts),
+            'added_tags': new_tags
+        })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error: {str(e)}'
         })
 
 # Make sure to include the new JavaScript file in your template

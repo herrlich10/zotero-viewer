@@ -604,3 +604,210 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Function to add tags to selected items via AJAX
+function addTagsToSelected(event) {
+    event.preventDefault();
+    
+    const tagInput = document.querySelector('input[name="new_tag"]');
+    const newTagsInput = tagInput.value.trim();
+    
+    if (!newTagsInput) {
+        showFlashMessage('Please enter at least one tag name', 'error');
+        return;
+    }
+    
+    const checked = document.querySelectorAll('input[name="selected_items"]:checked');
+    if (checked.length === 0) {
+        showFlashMessage('Please select at least one item', 'error');
+        return;
+    }
+    
+    // Create FormData to properly handle multiple values with the same name
+    const formData = new FormData();
+    formData.append('new_tag', newTagsInput);
+    
+    // Add each selected item ID
+    checked.forEach(checkbox => {
+        formData.append('selected_items', checkbox.value);
+    });
+    
+    // Get current URL parameters to pass to the server
+    const currentUrl = new URL(window.location.href);
+    const selectedTags = currentUrl.searchParams.getAll('tag');
+    
+    // Add the current selected tags to the request
+    selectedTags.forEach(tag => {
+        formData.append('selected_tags', tag);
+    });
+    
+    // Use fetch API with FormData
+    fetch("/add_tags", {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest'
+        }
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP error! Status: ${response.status}`);
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.success) {
+            // Show success message
+            showFlashMessage(data.message, 'success');
+            
+            // Clear the input field
+            tagInput.value = '';
+            
+            // Update the tag cloud with new counts
+            if (data.tag_counts) {
+                updateTagCloud(data.tag_counts);
+            }
+            
+            // Add the new tags to each selected item in the DOM
+            if (data.added_tags && data.added_tags.length > 0) {
+                checked.forEach(checkbox => {
+                    const itemId = checkbox.value;
+                    const item = document.getElementById(`item_${itemId}`).closest('.item');
+                    const tagsContainer = item.querySelector('.item-tags');
+                    
+                    // Add each new tag if it doesn't already exist
+                    data.added_tags.forEach(tagName => {
+                        // Check if tag already exists
+                        const existingTags = Array.from(tagsContainer.querySelectorAll('.tag'))
+                            .map(tag => tag.childNodes[0].textContent.trim());
+                        
+                        if (!existingTags.includes(tagName)) {
+                            const tagSpan = document.createElement('span');
+                            tagSpan.className = 'tag';
+                            tagSpan.innerHTML = `
+                                ${tagName}
+                                <button type="button" class="close-tag" title="Remove tag"
+                                        onclick="removeTag('${tagName}', ${itemId}, event)">&times;</button>
+                            `;
+                            tagsContainer.appendChild(tagSpan);
+                        }
+                    });
+                });
+                
+                // Update common tags display
+                updateCommonTags();
+                
+                // Update the item details panel if the currently highlighted item is one of the selected items
+                const highlightedItem = document.querySelector('.item.highlighted');
+                if (highlightedItem) {
+                    const highlightedItemId = highlightedItem.getAttribute('data-item-id');
+                    const selectedItemIds = Array.from(checked).map(cb => cb.value);
+                    
+                    if (selectedItemIds.includes(highlightedItemId)) {
+                        // Update the details panel with the new tags
+                        const detailsPanel = document.getElementById('item-details-content');
+                        if (!detailsPanel) return; // Exit if details panel doesn't exist
+                        
+                        let tagsSection = detailsPanel.querySelector('.detail-tags');
+                        
+                        // If there's no tags section yet, create one
+                        if (!tagsSection) {
+                            tagsSection = document.createElement('div');
+                            tagsSection.className = 'detail-tags';
+                            tagsSection.innerHTML = '<h3>Tags</h3><div class="detail-tags-list"></div>';
+                            detailsPanel.appendChild(tagsSection);
+                        }
+                        
+                        // Make sure the tags section is visible
+                        tagsSection.style.display = 'block';
+                        
+                        // Get or create the tags list
+                        let tagsList = tagsSection.querySelector('.detail-tags-list');
+                        if (!tagsList) {
+                            tagsList = document.createElement('div');
+                            tagsList.className = 'detail-tags-list';
+                            tagsSection.appendChild(tagsList);
+                        }
+                        
+                        // Get all existing tag texts in a more reliable way
+                        const existingTagTexts = [];
+                        tagsList.querySelectorAll('.detail-tag').forEach(tagEl => {
+                            // Extract the text content without the close button
+                            let tagText = '';
+                            for (const node of tagEl.childNodes) {
+                                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
+                                    tagText = node.textContent.trim();
+                                    existingTagTexts.push(tagText);
+                                    break;
+                                }
+                            }
+                        });
+                        
+                        // Add each new tag if it doesn't already exist
+                        data.added_tags.forEach(tagName => {
+                            if (!existingTagTexts.includes(tagName)) {
+                                const tagSpan = document.createElement('span');
+                                tagSpan.className = 'detail-tag';
+                                tagSpan.innerHTML = `
+                                    ${tagName}
+                                    <button type="button" class="close-tag" 
+                                            onclick="removeTag('${tagName}', ${highlightedItemId}, event)">&times;</button>
+                                `;
+                                tagsList.appendChild(tagSpan);
+                            }
+                        });
+                    }
+                }
+            }
+        } else {
+            // Show error message
+            showFlashMessage(data.message || 'Error adding tags', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        // Check if the tag was actually added despite the error
+        const tagInput = document.querySelector('input[name="new_tag"]');
+        const newTagsInput = tagInput.value.trim();
+        
+        // If the input is now empty, it's likely the operation succeeded
+        if (!newTagsInput) {
+            showFlashMessage('Tags may have been added successfully despite network error', 'warning');
+        } else {
+            showFlashMessage('Network error while adding tags. Please try again.', 'error');
+        }
+    });
+}
+
+// Helper function to show flash messages
+function showFlashMessage(message, type) {
+    const flashContainer = document.querySelector('.flash-messages');
+    const alertDiv = document.createElement('div');
+    alertDiv.className = `alert alert-${type}`;
+    alertDiv.textContent = message;
+    flashContainer.appendChild(alertDiv);
+    
+    // Auto-remove the flash message after 3 seconds
+    setTimeout(() => {
+        alertDiv.remove();
+    }, 3000);
+}
+
+// Update the DOMContentLoaded event handler to include the new functionality
+document.addEventListener('DOMContentLoaded', function() {
+    initializeTagFilterAndSort();
+    
+    const checkboxes = document.querySelectorAll('input[name="selected_items"]');
+    checkboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateCommonTags);
+    });
+    
+    // Initialize select all checkbox
+    initializeSelectAllCheckbox();
+    
+    // Add event listener to the add tags form
+    const addTagForm = document.getElementById('add-tag-form');
+    if (addTagForm) {
+        addTagForm.addEventListener('submit', addTagsToSelected);
+    }
+});

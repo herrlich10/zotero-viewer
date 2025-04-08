@@ -86,13 +86,15 @@
             <div class="filter-controls">
             </div>
 
-            <form method="post" enctype="multipart/form-data" onsubmit="return validateSelection()" class="bulk-tag-form">
+            <!-- Find the form for adding tags and add an ID -->
+            <form method="post" id="add-tag-form">
                 <div class="bulk-controls">
                     <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
                     <button type="submit" class="add-tag-button">
                         Add Tags to Selected
                     </button>
                 </div>
+            </form>
                 
                 <div class="common-tags-container" id="common-tags-container">
                     <span class="common-tags-label">Common tags:</span>

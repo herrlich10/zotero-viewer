@@ -37,17 +37,20 @@ function displayItemDetails(item) {
         <div class="detail-date">Published: ${item.date || 'No date'}</div>
     `;
     
-    // Add tags before abstract
+    // Add tags before abstract - ensure no duplicates
     if (item.tags && item.tags.length > 0) {
+        // Remove duplicate tags
+        const uniqueTags = [...new Set(item.tags)];
+        
         detailsHTML += `
             <div class="detail-tags">
                 <h3>Tags</h3>
-                <div>
-                    ${item.tags.map(tag => `
+                <div class="detail-tags-list">
+                    ${uniqueTags.map(tag => `
                         <span class="detail-tag">
                             ${tag}
                             <button type="button" class="close-tag" title="Remove tag" 
-                                    onclick="removeTag('${tag}', ${item.id})">&times;</button>
+                                    onclick="removeTag('${tag}', ${item.id}, event)">&times;</button>
                         </span>
                     `).join('')}
                 </div>
