@@ -128,7 +128,9 @@
                                     Unknown author
                                 {% endif %}
                             </div>
-                            <div class="item-date">{{ item.date }}</div>
+                            <div class="item-publication">{{ item.publication }}</div>
+                            <div class="item-date">Published: {{ item.date }}</div>
+                            <div class="item-date-added">Added: {{ item.dateAdded }}</div>
                             <div class="item-tags">
                                 Tags: 
                                 {% for tag in item.tags %}

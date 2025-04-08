@@ -24,6 +24,9 @@ def get_items_and_tags(connection):
         items.itemID,
         itemDataValues.value AS title,
         dateValues.value AS date,
+        items.dateAdded,
+        publicationValues.value AS publication,
+        abstractValues.value AS abstract,
         tags.name AS tag
     FROM items
     LEFT JOIN itemData ON items.itemID = itemData.itemID
@@ -31,8 +34,19 @@ def get_items_and_tags(connection):
     LEFT JOIN itemDataValues ON itemData.valueID = itemDataValues.valueID
     LEFT JOIN itemTags ON items.itemID = itemTags.itemID
     LEFT JOIN tags ON itemTags.tagID = tags.tagID
-    LEFT JOIN itemData dateData ON items.itemID = dateData.itemID AND dateData.fieldID = 14  -- Date field
+    
+    -- Date field (publication date)
+    LEFT JOIN itemData dateData ON items.itemID = dateData.itemID AND dateData.fieldID = 14
     LEFT JOIN itemDataValues dateValues ON dateData.valueID = dateValues.valueID
+    
+    -- Publication/Journal field
+    LEFT JOIN itemData pubData ON items.itemID = pubData.itemID AND pubData.fieldID = 12
+    LEFT JOIN itemDataValues publicationValues ON pubData.valueID = publicationValues.valueID
+    
+    -- Abstract field
+    LEFT JOIN itemData abstractData ON items.itemID = abstractData.itemID AND abstractData.fieldID = 90
+    LEFT JOIN itemDataValues abstractValues ON abstractData.valueID = abstractValues.valueID
+    
     WHERE items.itemTypeID != 14  -- Exclude attachments
     AND (fields.fieldName = 'title' OR fields.fieldName IS NULL)
     """
@@ -42,11 +56,26 @@ def get_items_and_tags(connection):
     for row in cursor.fetchall():
         item_id = row['itemID']
         if item_id not in items_dict:
+            # Format the dateAdded field to a readable format
+            date_added = row['dateAdded']
+            if date_added:
+                # Convert from Zotero's format (2023-01-01T12:00:00Z) to readable format
+                try:
+                    from datetime import datetime
+                    dt = datetime.strptime(date_added, '%Y-%m-%dT%H:%M:%SZ')
+                    date_added = dt.strftime('%Y-%m-%d')
+                except:
+                    # If parsing fails, keep the original format
+                    pass
+            
             items_dict[item_id] = {
                 'id': item_id,
                 'title': row['title'] or 'Untitled',
                 'author': [],  # Initialize as empty list to store multiple authors
                 'date': row['date'] or 'No date',
+                'dateAdded': date_added or 'Unknown',
+                'publication': row['publication'] or '',
+                'abstract': row['abstract'] or '',  # Store abstract but don't display yet
                 'tags': set()
             }
         if row['tag']:
