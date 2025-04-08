@@ -141,6 +141,33 @@ function removeTagFromSelected(tagName) {
                 updateTagCloud(data.tag_counts);
             }
             
+            // Update the item details panel if the currently highlighted item is one of the selected items
+            const highlightedItem = document.querySelector('.item.highlighted');
+            if (highlightedItem) {
+                const highlightedItemId = highlightedItem.getAttribute('data-item-id');
+                if (selectedItemIds.includes(highlightedItemId)) {
+                    // Find the tag in the details panel and remove it
+                    const detailsPanel = document.getElementById('item-details-content');
+                    const detailTagElements = detailsPanel.querySelectorAll('.detail-tag');
+                    
+                    detailTagElements.forEach(tagEl => {
+                        const tagText = tagEl.childNodes[0].textContent.trim();
+                        if (tagText === tagName) {
+                            tagEl.remove();
+                        }
+                    });
+                    
+                    // If there are no more tags, hide the tags section
+                    const remainingTags = detailsPanel.querySelectorAll('.detail-tag');
+                    if (remainingTags.length === 0) {
+                        const tagsSection = detailsPanel.querySelector('.detail-tags');
+                        if (tagsSection) {
+                            tagsSection.style.display = 'none';
+                        }
+                    }
+                }
+            }
+            
             // Auto-remove the flash message after 3 seconds
             setTimeout(() => {
                 alertDiv.remove();
