@@ -278,7 +278,7 @@ input[type="text"] {
     cursor: pointer;
 }
 
-/* Add this to your existing CSS file */
+/* Add these styles to your existing CSS file */
 
 .container {
     display: flex;
@@ -358,10 +358,4 @@ input[type="text"] {
     margin: 2px;
     border-radius: 3px;
     font-size: 0.9em;
-}
-
-/* Make sure checkboxes and buttons still show the correct cursor */
-.item input[type="checkbox"],
-.item button {
-    cursor: default;
 }

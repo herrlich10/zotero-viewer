@@ -37,17 +37,7 @@ function displayItemDetails(item) {
         <div class="detail-date">Published: ${item.date || 'No date'}</div>
     `;
     
-    // Add abstract if available
-    if (item.abstract) {
-        detailsHTML += `
-            <div class="detail-abstract">
-                <h3>Abstract</h3>
-                <p>${item.abstract}</p>
-            </div>
-        `;
-    }
-    
-    // Add tags
+    // Add tags before abstract
     if (item.tags && item.tags.length > 0) {
         detailsHTML += `
             <div class="detail-tags">
@@ -61,6 +51,16 @@ function displayItemDetails(item) {
                         </span>
                     `).join('')}
                 </div>
+            </div>
+        `;
+    }
+    
+    // Add abstract if available
+    if (item.abstract) {
+        detailsHTML += `
+            <div class="detail-abstract">
+                <h3>Abstract</h3>
+                <p>${item.abstract}</p>
             </div>
         `;
     }
