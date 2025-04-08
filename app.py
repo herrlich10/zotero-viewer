@@ -569,5 +569,31 @@ def rename_tag_in_database(conn, old_tag_name, new_tag_name):
     
     return True
 
+@app.route('/get_item_details/<item_id>')
+def get_item_details(item_id):
+    try:
+        # Find the item in our preloaded items
+        item = next((item for item in all_items if str(item['id']) == str(item_id)), None)
+        
+        if item:
+            return jsonify({
+                'success': True,
+                'item': item
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'Item not found'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving item details: {str(e)}'
+        })
+
+# Make sure to include the new JavaScript file in your template
+# Add this to the bottom of your index.html before the closing </body> tag:
+# <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
+
 if __name__ == '__main__':
     app.run(debug=True)

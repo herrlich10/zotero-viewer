@@ -81,15 +81,12 @@
             </div>
         </div>
         
-        <!-- Form remains unchanged -->
         <div class="main-content">
             <!-- Empty filter controls div - Active filters section removed -->
             <div class="filter-controls">
             </div>
 
-            <!-- Form remains unchanged -->
             <form method="post" enctype="multipart/form-data" onsubmit="return validateSelection()" class="bulk-tag-form">
-                <!-- Add this right after the bulk-controls div -->
                 <div class="bulk-controls">
                     <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
                     <button type="submit" class="add-tag-button">
@@ -97,7 +94,6 @@
                     </button>
                 </div>
                 
-                <!-- Add this new container for common tags -->
                 <div class="common-tags-container" id="common-tags-container">
                     <span class="common-tags-label">Common tags:</span>
                     <div id="common-tags-list"></div>
@@ -111,12 +107,13 @@
                 {% if items %}
                     <!-- Add data-item-id attribute to each item div and make them double-clickable -->
                     {% for item in items %}
-                        <div class="item" data-item-id="{{ item.id }}">
+                        <div class="item" data-item-id="{{ item.id }}" onclick="highlightItem(this, {{ item.id }})">
                             <!-- Ensure checkbox has correct name and value -->
                             <input type="checkbox" 
                                 name="selected_items" 
                                 value="{{ item.id }}"
-                                id="item_{{ item.id }}">
+                                id="item_{{ item.id }}"
+                                onclick="event.stopPropagation()">
                             <!-- Replace the commented out item-tags div with this version -->
                             <div class="item-title"><strong>{{ item.title }}</strong></div>
                             <div class="item-author">
@@ -148,10 +145,19 @@
                 {% endif %}
             </form>
         </div>
+        
+        <!-- New details panel column -->
+        <div class="details-panel">
+            <h2>Item Details</h2>
+            <div id="item-details-content">
+                <p class="select-message">Select an item to view details</p>
+            </div>
+        </div>
     </div>
 
-    <!-- Include the external JavaScript file -->
+    <!-- Include the external JavaScript files -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script src="{{ url_for('static', filename='js/attachment-handler.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
 </body>
 </html>
