@@ -416,5 +416,89 @@ def get_attachment_path_for_item(conn, item_id):
     # Remove the finally block that closes the connection
     # The with_transaction decorator will handle closing the connection
 
+@app.route('/rename_tag', methods=['POST'])
+def rename_tag():
+    data = request.json
+    old_tag_name = data.get('old_tag_name')
+    new_tag_name = data.get('new_tag_name')
+    
+    if not old_tag_name or not new_tag_name:
+        return jsonify({
+            'success': False,
+            'message': 'Missing old or new tag name'
+        })
+    
+    try:
+        # Create a new function to handle tag renaming
+        success = rename_tag_in_database(old_tag_name, new_tag_name)
+        
+        if success:
+            # Force reload of all items data from the database
+            global all_items
+            refresh_conn = sqlite3.connect(database_path)
+            refresh_conn.row_factory = sqlite3.Row
+            all_items = get_items_and_tags(refresh_conn)
+            refresh_conn.close()
+            
+            return jsonify({
+                'success': True,
+                'message': f'Renamed tag "{old_tag_name}" to "{new_tag_name}"'
+            })
+        else:
+            return jsonify({
+                'success': False,
+                'message': f'Tag "{old_tag_name}" not found'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error renaming tag: {str(e)}'
+        })
+
+@with_transaction
+def rename_tag_in_database(conn, old_tag_name, new_tag_name):
+    cursor = conn.cursor()
+    
+    # Check if the old tag exists
+    cursor.execute("SELECT tagID FROM tags WHERE name = ?", (old_tag_name,))
+    old_tag_result = cursor.fetchone()
+    if not old_tag_result:
+        return False  # Old tag doesn't exist
+    
+    old_tag_id = old_tag_result['tagID']
+    
+    # Check if the new tag already exists
+    cursor.execute("SELECT tagID FROM tags WHERE name = ?", (new_tag_name,))
+    new_tag_result = cursor.fetchone()
+    
+    if new_tag_result:
+        # New tag already exists, need to merge tags
+        new_tag_id = new_tag_result['tagID']
+        
+        # Get all items with the old tag
+        cursor.execute("SELECT itemID FROM itemTags WHERE tagID = ?", (old_tag_id,))
+        items_with_old_tag = [row['itemID'] for row in cursor.fetchall()]
+        
+        # For each item with the old tag, check if it already has the new tag
+        for item_id in items_with_old_tag:
+            cursor.execute("SELECT * FROM itemTags WHERE itemID = ? AND tagID = ?", 
+                          (item_id, new_tag_id))
+            if not cursor.fetchone():
+                # Item doesn't have the new tag yet, add it
+                cursor.execute("INSERT INTO itemTags (itemID, tagID, type) VALUES (?, ?, 0)",
+                              (item_id, new_tag_id))
+        
+        # Delete all associations with the old tag
+        cursor.execute("DELETE FROM itemTags WHERE tagID = ?", (old_tag_id,))
+        
+        # Delete the old tag
+        cursor.execute("DELETE FROM tags WHERE tagID = ?", (old_tag_id,))
+    else:
+        # New tag doesn't exist, simply rename the old tag
+        cursor.execute("UPDATE tags SET name = ? WHERE tagID = ?", 
+                      (new_tag_name, old_tag_id))
+    
+    return True
+
 if __name__ == '__main__':
     app.run(debug=True)

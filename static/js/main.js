@@ -417,3 +417,63 @@ function removeTag(tagName, itemId) {
     form.submit();
     document.body.removeChild(form);
 }
+
+// Add this function to handle tag renaming
+function renameTag(oldTagName) {
+    const newTagName = prompt(`Rename tag "${oldTagName}" to:`, oldTagName);
+    
+    // If user cancels or enters the same name, do nothing
+    if (!newTagName || newTagName === oldTagName || newTagName.trim() === '') {
+        return;
+    }
+    
+    // Send request to rename tag
+    fetch('/rename_tag', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            old_tag_name: oldTagName,
+            new_tag_name: newTagName.trim()
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show updated tags
+            window.location.reload();
+        } else {
+            alert(data.message || 'Error renaming tag');
+        }
+    })
+    .catch(error => {
+        console.error('Error renaming tag:', error);
+        alert('Error renaming tag');
+    });
+}
+
+// Initialize context menu for tags when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Add context menu event listeners ONLY to tags in the tag cloud
+    // Use a more specific selector to target only the tags in the tag cloud
+    const tagCloudTags = document.querySelectorAll('#tag-cloud .tag');
+    
+    tagCloudTags.forEach(tag => {
+        // Update title attribute to indicate right-click functionality
+        tag.setAttribute('title', 'Right-click to rename');
+        
+        // Add context menu (right-click) event listener
+        tag.addEventListener('contextmenu', function(e) {
+            // Prevent the default context menu
+            e.preventDefault();
+            
+            // Get the tag name (remove the count in parentheses)
+            const tagText = this.textContent.trim();
+            const tagName = tagText.replace(/\s*\(\d+\)$/, '');
+            
+            // Call the rename function
+            renameTag(tagName);
+        });
+    });
+});
