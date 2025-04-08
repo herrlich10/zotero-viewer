@@ -420,29 +420,115 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Function to remove a tag from a single item
 function removeTag(tagName, itemId) {
-    // Create a form dynamically
-    const form = document.createElement('form');
-    form.method = 'POST';
-    form.action = "/remove_tag";
+    // Create FormData to properly handle the data
+    const formData = new FormData();
+    formData.append('tag_name', tagName);
+    formData.append('item_id', itemId);
     
-    // Add tag name input
-    const tagInput = document.createElement('input');
-    tagInput.type = 'hidden';
-    tagInput.name = 'tag_name';
-    tagInput.value = tagName;
-    form.appendChild(tagInput);
+    // Get current URL parameters to pass to the server
+    const currentUrl = new URL(window.location.href);
+    const selectedTags = currentUrl.searchParams.getAll('tag');
     
-    // Add item id input
-    const itemInput = document.createElement('input');
-    itemInput.type = 'hidden';
-    itemInput.name = 'item_id';
-    itemInput.value = itemId;
-    form.appendChild(itemInput);
+    // Add the current selected tags to the request
+    selectedTags.forEach(tag => {
+        formData.append('selected_tags', tag);
+    });
     
-    // Add form to body, submit it, and remove it
-    document.body.appendChild(form);
-    form.submit();
-    document.body.removeChild(form);
+    // Use fetch API with FormData
+    fetch("/remove_tag", {
+        method: 'POST',
+        body: formData
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Show success message without page reload
+            const flashContainer = document.querySelector('.flash-messages');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-success';
+            alertDiv.textContent = data.message;
+            flashContainer.appendChild(alertDiv);
+            
+            // Remove the tag from the DOM for the item
+            const item = document.getElementById(`item_${itemId}`).closest('.item');
+            const tagElements = item.querySelectorAll('.item-tags .tag');
+            
+            tagElements.forEach(tagEl => {
+                if (tagEl.childNodes[0].textContent.trim() === tagName) {
+                    tagEl.remove();
+                }
+            });
+            
+            // Update the tag cloud with new counts
+            if (data.tag_counts) {
+                updateTagCloud(data.tag_counts);
+            }
+            
+            // Update common tags if this item is selected
+            const isItemSelected = document.getElementById(`item_${itemId}`).checked;
+            if (isItemSelected) {
+                updateCommonTags();
+            }
+            
+            // Update the item details panel if this is the highlighted item
+            const highlightedItem = document.querySelector('.item.highlighted');
+            if (highlightedItem && highlightedItem.getAttribute('data-item-id') === itemId) {
+                const detailsPanel = document.getElementById('item-details-content');
+                const detailTagElements = detailsPanel.querySelectorAll('.detail-tag');
+                
+                detailTagElements.forEach(tagEl => {
+                    const tagText = tagEl.childNodes[0].textContent.trim();
+                    if (tagText === tagName) {
+                        tagEl.remove();
+                    }
+                });
+                
+                // If there are no more tags, hide the tags section
+                const remainingTags = detailsPanel.querySelectorAll('.detail-tag');
+                if (remainingTags.length === 0) {
+                    const tagsSection = detailsPanel.querySelector('.detail-tags');
+                    if (tagsSection) {
+                        tagsSection.style.display = 'none';
+                    }
+                }
+            }
+            
+            // Auto-remove the flash message after 3 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        } else {
+            // Show error message
+            const flashContainer = document.querySelector('.flash-messages');
+            const alertDiv = document.createElement('div');
+            alertDiv.className = 'alert alert-error';
+            alertDiv.textContent = data.message || 'Error removing tag';
+            flashContainer.appendChild(alertDiv);
+            
+            // Auto-remove the flash message after 3 seconds
+            setTimeout(() => {
+                alertDiv.remove();
+            }, 3000);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        
+        // Show error message
+        const flashContainer = document.querySelector('.flash-messages');
+        const alertDiv = document.createElement('div');
+        alertDiv.className = 'alert alert-error';
+        alertDiv.textContent = 'Network error while removing tag';
+        flashContainer.appendChild(alertDiv);
+        
+        // Auto-remove the flash message after 3 seconds
+        setTimeout(() => {
+            alertDiv.remove();
+        }, 3000);
+    });
+    
+    // Prevent event propagation
+    event.stopPropagation();
 }
 
 // Add this function to handle tag renaming

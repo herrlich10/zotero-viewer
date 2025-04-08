@@ -295,15 +295,17 @@ def index():
         )
 
 # Add a new route to handle tag removal
-# Fix the remove_tag route
+# Update the remove_tag route to return JSON
 @app.route('/remove_tag', methods=['POST'])
 def remove_tag():
     tag_name = request.form.get('tag_name')
     item_id = request.form.get('item_id')
     
     if not tag_name or not item_id:
-        flash('Missing tag name or item ID', 'error')
-        return redirect(url_for('index'))
+        return jsonify({
+            'success': False,
+            'message': 'Missing tag name or item ID'
+        })
     
     try:
         item_id = int(item_id)
@@ -318,14 +320,36 @@ def remove_tag():
             all_items = get_items_and_tags(refresh_conn)
             refresh_conn.close()
             
-            flash(f'Removed tag "{tag_name}" from item', 'success')
+            # Get the current selected tags from the request
+            selected_tags = request.form.getlist('selected_tags')
+            
+            # Filter items that contain ALL selected tags
+            filtered_items = [
+                item for item in all_items
+                if all(tag in item['tags'] for tag in selected_tags)
+            ] if selected_tags else all_items
+            
+            # Create tag cloud with counts for current selection
+            tag_counts = defaultdict(int)
+            for item in filtered_items:
+                for tag in item['tags']:
+                    tag_counts[tag] += 1
+            
+            return jsonify({
+                'success': True,
+                'message': f'Removed tag "{tag_name}" from item',
+                'tag_counts': dict(tag_counts)
+            })
         else:
-            flash(f'Tag "{tag_name}" not found', 'error')
+            return jsonify({
+                'success': False,
+                'message': f'Tag "{tag_name}" not found'
+            })
     except Exception as e:
-        flash(f'Error removing tag: {str(e)}', 'error')
-    
-    # Redirect back to the current page with any existing filter parameters
-    return redirect(request.referrer or url_for('index'))
+        return jsonify({
+            'success': False,
+            'message': f'Error removing tag: {str(e)}'
+        })
 
 # Add a new route to handle batch tag removal
 @app.route('/remove_tag_batch', methods=['POST'])
