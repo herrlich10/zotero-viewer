@@ -419,7 +419,13 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 // Function to remove a tag from a single item
-function removeTag(tagName, itemId) {
+function removeTag(tagName, itemId, event) {
+    // Add event parameter and check if it exists
+    if (event) {
+        // Prevent event propagation
+        event.stopPropagation();
+    }
+    
     // Create FormData to properly handle the data
     const formData = new FormData();
     formData.append('tag_name', tagName);
@@ -472,23 +478,34 @@ function removeTag(tagName, itemId) {
             
             // Update the item details panel if this is the highlighted item
             const highlightedItem = document.querySelector('.item.highlighted');
-            if (highlightedItem && highlightedItem.getAttribute('data-item-id') === itemId) {
-                const detailsPanel = document.getElementById('item-details-content');
-                const detailTagElements = detailsPanel.querySelectorAll('.detail-tag');
-                
-                detailTagElements.forEach(tagEl => {
-                    const tagText = tagEl.childNodes[0].textContent.trim();
-                    if (tagText === tagName) {
-                        tagEl.remove();
-                    }
-                });
-                
-                // If there are no more tags, hide the tags section
-                const remainingTags = detailsPanel.querySelectorAll('.detail-tag');
-                if (remainingTags.length === 0) {
-                    const tagsSection = detailsPanel.querySelector('.detail-tags');
-                    if (tagsSection) {
-                        tagsSection.style.display = 'none';
+            
+            if (highlightedItem) {
+                const highlightedItemId = highlightedItem.getAttribute('data-item-id');
+                if (String(highlightedItemId) === String(itemId)) {
+                    const detailsPanel = document.getElementById('item-details-content');
+                    const detailTagElements = detailsPanel.querySelectorAll('.detail-tag');
+                    
+                    detailTagElements.forEach(tagEl => {
+                        // More robust way to get the tag text
+                        let tagText = '';
+                        if (tagEl.childNodes.length > 0 && tagEl.childNodes[0].nodeType === Node.TEXT_NODE) {
+                            tagText = tagEl.childNodes[0].textContent.trim();
+                        } else {
+                            tagText = tagEl.textContent.trim().replace(/×$/, ''); // Remove the × if present
+                        }
+                        
+                        if (tagText === tagName) {
+                            tagEl.remove();
+                        }
+                    });
+                    
+                    // If there are no more tags, hide the tags section
+                    const remainingTags = detailsPanel.querySelectorAll('.detail-tag');
+                    if (remainingTags.length === 0) {
+                        const tagsSection = detailsPanel.querySelector('.detail-tags');
+                        if (tagsSection) {
+                            tagsSection.style.display = 'none';
+                        }
                     }
                 }
             }
@@ -526,9 +543,6 @@ function removeTag(tagName, itemId) {
             alertDiv.remove();
         }, 3000);
     });
-    
-    // Prevent event propagation
-    event.stopPropagation();
 }
 
 // Add this function to handle tag renaming

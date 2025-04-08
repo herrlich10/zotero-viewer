@@ -133,8 +133,9 @@
                                 {% for tag in item.tags %}
                                     <span class="tag">
                                         {{ tag }}
+                                        <!-- Update the onclick attribute in the close-tag button -->
                                         <button type="button" class="close-tag" title="Remove tag" 
-                                                onclick="removeTag('{{ tag }}', {{ item.id }})">&times;</button>
+                                                onclick="removeTag('{{ tag }}', {{ item.id }}, event)">&times;</button>
                                     </span>
                                 {% endfor %}
                             </div>
