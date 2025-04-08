@@ -704,58 +704,18 @@ function addTagsToSelected(event) {
                     const selectedItemIds = Array.from(checked).map(cb => cb.value);
                     
                     if (selectedItemIds.includes(highlightedItemId)) {
-                        // Update the details panel with the new tags
-                        const detailsPanel = document.getElementById('item-details-content');
-                        if (!detailsPanel) return; // Exit if details panel doesn't exist
-                        
-                        let tagsSection = detailsPanel.querySelector('.detail-tags');
-                        
-                        // If there's no tags section yet, create one
-                        if (!tagsSection) {
-                            tagsSection = document.createElement('div');
-                            tagsSection.className = 'detail-tags';
-                            tagsSection.innerHTML = '<h3>Tags</h3><div class="detail-tags-list"></div>';
-                            detailsPanel.appendChild(tagsSection);
-                        }
-                        
-                        // Make sure the tags section is visible
-                        tagsSection.style.display = 'block';
-                        
-                        // Get or create the tags list
-                        let tagsList = tagsSection.querySelector('.detail-tags-list');
-                        if (!tagsList) {
-                            tagsList = document.createElement('div');
-                            tagsList.className = 'detail-tags-list';
-                            tagsSection.appendChild(tagsList);
-                        }
-                        
-                        // Get all existing tag texts in a more reliable way
-                        const existingTagTexts = [];
-                        tagsList.querySelectorAll('.detail-tag').forEach(tagEl => {
-                            // Extract the text content without the close button
-                            let tagText = '';
-                            for (const node of tagEl.childNodes) {
-                                if (node.nodeType === Node.TEXT_NODE && node.textContent.trim()) {
-                                    tagText = node.textContent.trim();
-                                    existingTagTexts.push(tagText);
-                                    break;
+                        // Instead of manually updating the details panel, just re-fetch the item details
+                        // This will use displayItemDetails which already handles duplicate tags
+                        fetch(`/get_item_details/${highlightedItemId}`)
+                            .then(response => response.json())
+                            .then(data => {
+                                if (data.success) {
+                                    displayItemDetails(data.item);
                                 }
-                            }
-                        });
-                        
-                        // Add each new tag if it doesn't already exist
-                        data.added_tags.forEach(tagName => {
-                            if (!existingTagTexts.includes(tagName)) {
-                                const tagSpan = document.createElement('span');
-                                tagSpan.className = 'detail-tag';
-                                tagSpan.innerHTML = `
-                                    ${tagName}
-                                    <button type="button" class="close-tag" 
-                                            onclick="removeTag('${tagName}', ${highlightedItemId}, event)">&times;</button>
-                                `;
-                                tagsList.appendChild(tagSpan);
-                            }
-                        });
+                            })
+                            .catch(error => {
+                                console.error('Error refreshing item details:', error);
+                            });
                     }
                 }
             }
