@@ -187,6 +187,7 @@ function removeTagFromSelected(tagName) {
 }
 
 // Function to update the tag cloud
+// Function to update the tag cloud
 function updateTagCloud(tagCounts) {
     const tagCloud = document.getElementById('tag-cloud');
     const selectedTags = new URLSearchParams(window.location.search).getAll('tag');
@@ -215,6 +216,15 @@ function updateTagCloud(tagCounts) {
         tagDiv.setAttribute('data-count', count);
         tagDiv.textContent = `${tag} (${count})`;
         tagDiv.onclick = function() { toggleTag(tag); };
+        
+        // Add right-click functionality for tag renaming
+        tagDiv.setAttribute('title', 'Right-click to rename');
+        tagDiv.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+            const tagText = this.textContent.trim();
+            const tagName = tagText.replace(/\s*\(\d+\)$/, '');
+            renameTag(tagName);
+        });
         
         // Apply current filter
         if (currentFilterText && !tag.toLowerCase().includes(currentFilterText)) {
