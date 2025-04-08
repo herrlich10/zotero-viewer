@@ -378,7 +378,7 @@ function initializeSelectAllCheckbox() {
     updateSelectAllCheckbox();
 }
 
-// Update the DOMContentLoaded event handler to include the new function
+// Update the DOMContentLoaded event handler to include the new functionality
 document.addEventListener('DOMContentLoaded', function() {
     initializeTagFilterAndSort();
     
@@ -390,7 +390,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize select all checkbox
     initializeSelectAllCheckbox();
 });
-
 
 // Function to remove a tag from a single item
 function removeTag(tagName, itemId) {

@@ -319,5 +319,102 @@ def remove_tag_batch():
     # Redirect back to the current page with any existing filter parameters
     return redirect(request.referrer or url_for('index'))
 
+@app.route('/get_attachment/<item_id>')
+def get_attachment(item_id):
+    try:
+        # Get the attachment path from the database
+        attachment_path = get_attachment_path_for_item(item_id)
+
+        if attachment_path and os.path.exists(attachment_path):
+            # For local files, use file:// protocol with proper encoding
+            # Ensure the path is properly formatted for URLs
+            # Convert spaces to %20 and other special characters
+            from urllib.parse import quote
+            encoded_path = quote(attachment_path)
+            file_url = f"file://{encoded_path}"
+            
+            # Try to open the file with the system default application
+            try:
+                import subprocess
+                # Use 'open' command on macOS to open with default application
+                subprocess.Popen(['open', attachment_path])
+                return jsonify({
+                    'success': True,
+                    'message': 'File opened with system viewer',
+                    'attachment_path': file_url,
+                    'local_path': attachment_path
+                })
+            except Exception as open_error:
+                print(f"Error opening file with system viewer: {str(open_error)}")
+                # If system opening fails, return the URL for browser-side handling
+                return jsonify({
+                    'success': True,
+                    'message': 'File found but could not open with system viewer',
+                    'attachment_path': file_url,
+                    'local_path': attachment_path
+                })
+        else:
+            return jsonify({
+                'success': False,
+                'message': 'No attachment found for this item.'
+            })
+    except Exception as e:
+        return jsonify({
+            'success': False,
+            'message': f'Error retrieving attachment: {str(e)}'
+        })
+
+# Use the with_transaction decorator like other functions
+@with_transaction
+def get_attachment_path_for_item(conn, item_id):
+    """Get the file path for a PDF attachment associated with an item"""
+    try:
+        cursor = conn.cursor()
+        
+        # Query to find PDF attachments for the given item
+        query = """
+        SELECT
+            items.key AS item_key,
+            itemAttachments.path AS attachment_path,
+            itemAttachments.contentType AS content_type,
+            itemAttachments.linkMode AS link_mode
+        FROM items
+        JOIN itemAttachments ON items.itemID = itemAttachments.itemID
+        WHERE itemAttachments.parentItemID = ?
+        AND (itemAttachments.contentType = 'application/pdf' 
+             OR itemAttachments.contentType LIKE '%pdf%'
+             OR itemAttachments.path LIKE '%.pdf')
+        LIMIT 1
+        """
+        
+        cursor.execute(query, (item_id,))
+        result = cursor.fetchone()
+        
+        if not result:
+            print(f"No attachment found for item {item_id}")
+            return None
+        
+        attachment_path = result['attachment_path']
+        link_mode = result['link_mode']
+        
+        # Handle link_mode 2 (linked URL) - typically used by ZotFile with custom locations
+        if link_mode == 2:
+            # For ZotFile with link_mode 2, the path might be a file:// URL or a direct path
+            if attachment_path.startswith('attachments:'):
+                # Convert file:// URL to a file path
+                file_path = attachment_path.replace('attachments:', os.path.expanduser("~")+'/')
+                if os.path.exists(file_path):
+                    return file_path
+            
+        # If we get here, we couldn't find the file
+        print("Could not find attachment file")
+        return None
+        
+    except Exception as e:
+        print(f"Error getting attachment path: {str(e)}")
+        return None
+    # Remove the finally block that closes the connection
+    # The with_transaction decorator will handle closing the connection
+
 if __name__ == '__main__':
     app.run(debug=True)

@@ -109,8 +109,9 @@
                     <label for="select-all-checkbox">Select All</label>
                 </div>
                 {% if items %}
+                    <!-- Add data-item-id attribute to each item div and make them double-clickable -->
                     {% for item in items %}
-                        <div class="item">
+                        <div class="item" data-item-id="{{ item.id }}">
                             <!-- Ensure checkbox has correct name and value -->
                             <input type="checkbox" 
                                 name="selected_items" 
@@ -141,5 +142,6 @@
 
     <!-- Include the external JavaScript file -->
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/attachment-handler.js') }}"></script>
 </body>
 </html>
