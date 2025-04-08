@@ -119,7 +119,15 @@
                                 id="item_{{ item.id }}">
                             <!-- Replace the commented out item-tags div with this version -->
                             <div class="item-title"><strong>{{ item.title }}</strong></div>
-                            <div class="item-author">{{ item.author }}</div>
+                            <div class="item-author">
+                                {% if item.author is string %}
+                                    {{ item.author }}
+                                {% elif item.author is iterable and item.author %}
+                                    {{ item.author|join(', ') }}
+                                {% else %}
+                                    Unknown author
+                                {% endif %}
+                            </div>
                             <div class="item-date">{{ item.date }}</div>
                             <div class="item-tags">
                                 Tags: 

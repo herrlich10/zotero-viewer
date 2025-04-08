@@ -17,19 +17,18 @@ conn.row_factory = sqlite3.Row
 def get_items_and_tags(connection):
     """Retrieve main items with metadata and tags using provided connection"""
     cursor = connection.cursor()
+    
+    # First, get basic item information without authors
     query = """
     SELECT
         items.itemID,
         itemDataValues.value AS title,
-        creators.firstName || ' ' || creators.lastName AS author,
         dateValues.value AS date,
         tags.name AS tag
     FROM items
     LEFT JOIN itemData ON items.itemID = itemData.itemID
     LEFT JOIN fields ON itemData.fieldID = fields.fieldID
     LEFT JOIN itemDataValues ON itemData.valueID = itemDataValues.valueID
-    LEFT JOIN itemCreators ON items.itemID = itemCreators.itemID
-    LEFT JOIN creators ON itemCreators.creatorID = creators.creatorID
     LEFT JOIN itemTags ON items.itemID = itemTags.itemID
     LEFT JOIN tags ON itemTags.tagID = tags.tagID
     LEFT JOIN itemData dateData ON items.itemID = dateData.itemID AND dateData.fieldID = 14  -- Date field
@@ -46,16 +45,57 @@ def get_items_and_tags(connection):
             items_dict[item_id] = {
                 'id': item_id,
                 'title': row['title'] or 'Untitled',
-                'author': row['author'] or 'Unknown author',
+                'author': [],  # Initialize as empty list to store multiple authors
                 'date': row['date'] or 'No date',
                 'tags': set()
             }
         if row['tag']:
             items_dict[item_id]['tags'].add(row['tag'])
     
+    # Now get all authors for each item
+    author_query = """
+    SELECT
+        items.itemID,
+        creators.firstName,
+        creators.lastName,
+        creatorTypes.creatorType
+    FROM items
+    JOIN itemCreators ON items.itemID = itemCreators.itemID
+    JOIN creators ON itemCreators.creatorID = creators.creatorID
+    JOIN creatorTypes ON itemCreators.creatorTypeID = creatorTypes.creatorTypeID
+    WHERE items.itemTypeID != 14  -- Exclude attachments
+    ORDER BY items.itemID, itemCreators.orderIndex
+    """
+    cursor.execute(author_query)
+    
+    for row in cursor.fetchall():
+        item_id = row['itemID']
+        if item_id in items_dict:
+            first_name = row['firstName'] or ''
+            last_name = row['lastName'] or ''
+            
+            # Format the author name based on available parts
+            if first_name and last_name:
+                author_name = f"{first_name} {last_name}"
+            elif last_name:
+                author_name = last_name
+            elif first_name:
+                author_name = first_name
+            else:
+                author_name = "Unknown author"
+                
+            # Add the author to the list
+            items_dict[item_id]['author'].append(author_name)
+    
+    # For items with no authors, set a default value
+    for item in items_dict.values():
+        if not item['author']:
+            item['author'] = ['Unknown author']
+    
     # Convert sets to lists for easier template handling
     for item in items_dict.values():
         item['tags'] = list(item['tags'])
+    
     return list(items_dict.values())
 
 # Preload all items and tags
