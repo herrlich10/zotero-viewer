@@ -101,7 +101,14 @@
                     <div id="common-tags-list"></div>
                 </div>
                 
-                <h2>References ({{ items|length }})</h2>
+                <!-- Add this right after the bulk-controls div and before the common-tags-container -->
+                <div class="search-container">
+                    <input type="text" id="item-search" placeholder="Search items..." class="search-input">
+                    <button id="clear-search" class="clear-search-button" title="Clear search">×</button>
+                </div>
+                
+                <!-- Update the References heading to include a dynamic count -->
+                <h2>References (<span id="item-count">{{ items|length }}</span>)</h2>
                 <div class="select-all-container">
                     <input type="checkbox" id="select-all-checkbox">
                     <label for="select-all-checkbox">Select All</label>
@@ -180,5 +187,6 @@
     <script src="{{ url_for('static', filename='js/attachment-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
     <script src="{{ url_for('static', filename='js/item-sorter.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/item-search.js') }}"></script>
 </body>
 </html>

@@ -447,3 +447,36 @@ input[type="text"] {
     font-weight: bold;
     background-color: #e9ecef;
 }
+
+/* Add styles for the search box */
+.search-container {
+    display: flex;
+    margin-bottom: 15px;
+    position: relative;
+}
+
+.search-input {
+    flex: 1;
+    padding: 8px 30px 8px 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1em;
+}
+
+.clear-search-button {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    color: #999;
+    font-size: 1.2em;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+}
+
+.clear-search-button:hover {
+    color: #333;
+}
