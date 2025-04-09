@@ -595,9 +595,19 @@ function addTagsToSelected(event) {
         return;
     }
     
+    // Split tags by both comma and semicolon
+    const tagArray = newTagsInput.split(/[,;]/).map(tag => tag.trim()).filter(tag => tag);
+    
+    // Process hierarchical tags to include parent tags
+    const tagsToAdd = processHierarchicalTags(tagArray);
+    
     // Create FormData to properly handle multiple values with the same name
     const formData = new FormData();
-    formData.append('new_tag', newTagsInput);
+    
+    // Add each tag (including parent tags) to the request
+    tagsToAdd.forEach(tag => {
+        formData.append('new_tag', tag);
+    });
     
     // Add each selected item ID
     checked.forEach(checkbox => {
@@ -765,3 +775,34 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Function to process hierarchical tags and generate parent tags
+function processHierarchicalTags(tags) {
+    const allTags = new Set();
+    
+    tags.forEach(tag => {
+        // Skip empty tags
+        if (!tag) return;
+        
+        // Add the original tag
+        allTags.add(tag);
+        
+        // If tag contains '/', generate parent tags
+        if (tag.includes('/')) {
+            const parts = tag.split('/');
+            let currentPath = '';
+            
+            // Build each level of the hierarchy
+            for (let i = 0; i < parts.length - 1; i++) {
+                if (i === 0) {
+                    currentPath = parts[0];
+                } else {
+                    currentPath = `${currentPath}/${parts[i]}`;
+                }
+                allTags.add(currentPath);
+            }
+        }
+    });
+    
+    return Array.from(allTags);
+}

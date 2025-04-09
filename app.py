@@ -634,7 +634,7 @@ def get_item_details(item_id):
 # Add a new route specifically for AJAX tag addition
 @app.route('/add_tags', methods=['POST'])
 def add_tags():
-    new_tags_input = request.form.get('new_tag', '').strip()
+    new_tags_input = request.form.getlist('new_tag')
     selected_items = request.form.getlist('selected_items')
     selected_tags = request.form.getlist('selected_tags')
     
@@ -644,8 +644,8 @@ def add_tags():
             'message': 'Please enter at least one tag name'
         })
     
-    # Split the input by comma or semicolon to get multiple tags
-    new_tags = [tag.strip() for tag in re.split(r'[,;]', new_tags_input) if tag.strip()]
+    # Process the tags (they're already split in JavaScript)
+    new_tags = [tag.strip() for tag in new_tags_input if tag.strip()]
     
     if not new_tags:
         return jsonify({
