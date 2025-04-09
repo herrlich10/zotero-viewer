@@ -415,19 +415,6 @@ function initializeSelectAllCheckbox() {
     updateSelectAllCheckbox();
 }
 
-// Update the DOMContentLoaded event handler to include the new functionality
-document.addEventListener('DOMContentLoaded', function() {
-    initializeTagFilterAndSort();
-    
-    const checkboxes = document.querySelectorAll('input[name="selected_items"]');
-    checkboxes.forEach(checkbox => {
-        checkbox.addEventListener('change', updateCommonTags);
-    });
-    
-    // Initialize select all checkbox
-    initializeSelectAllCheckbox();
-});
-
 // Function to remove a tag from a single item
 function removeTag(tagName, itemId, event) {
     // Add event parameter and check if it exists
@@ -590,31 +577,6 @@ function renameTag(oldTagName) {
     });
 }
 
-// Initialize context menu for tags when the DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    // Add context menu event listeners ONLY to tags in the tag cloud
-    // Use a more specific selector to target only the tags in the tag cloud
-    const tagCloudTags = document.querySelectorAll('#tag-cloud .tag');
-    
-    tagCloudTags.forEach(tag => {
-        // Update title attribute to indicate right-click functionality
-        tag.setAttribute('title', 'Right-click to rename');
-        
-        // Add context menu (right-click) event listener
-        tag.addEventListener('contextmenu', function(e) {
-            // Prevent the default context menu
-            e.preventDefault();
-            
-            // Get the tag name (remove the count in parentheses)
-            const tagText = this.textContent.trim();
-            const tagName = tagText.replace(/\s*\(\d+\)$/, '');
-            
-            // Call the rename function
-            renameTag(tagName);
-        });
-    });
-});
-
 // Function to add tags to selected items via AJAX
 function addTagsToSelected(event) {
     event.preventDefault();
@@ -763,10 +725,12 @@ function showFlashMessage(message, type) {
     }, 3000);
 }
 
-// Update the DOMContentLoaded event handler to include the new functionality
+// Add this single consolidated DOMContentLoaded event listener at the end of the file:
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize tag filter and sort
     initializeTagFilterAndSort();
     
+    // Initialize checkboxes for common tags
     const checkboxes = document.querySelectorAll('input[name="selected_items"]');
     checkboxes.forEach(checkbox => {
         checkbox.addEventListener('change', updateCommonTags);
@@ -780,4 +744,24 @@ document.addEventListener('DOMContentLoaded', function() {
     if (addTagForm) {
         addTagForm.addEventListener('submit', addTagsToSelected);
     }
+    
+    // Initialize context menu for tags in the tag cloud
+    const tagCloudTags = document.querySelectorAll('#tag-cloud .tag');
+    tagCloudTags.forEach(tag => {
+        // Update title attribute to indicate right-click functionality
+        tag.setAttribute('title', 'Right-click to rename');
+        
+        // Add context menu (right-click) event listener
+        tag.addEventListener('contextmenu', function(e) {
+            // Prevent the default context menu
+            e.preventDefault();
+            
+            // Get the tag name (remove the count in parentheses)
+            const tagText = this.textContent.trim();
+            const tagName = tagText.replace(/\s*\(\d+\)$/, '');
+            
+            // Call the rename function
+            renameTag(tagName);
+        });
+    });
 });
