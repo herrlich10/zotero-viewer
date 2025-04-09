@@ -8,7 +8,7 @@ from datetime import datetime
 
 # Connect to database
 if len(sys.argv) < 2:
-    print("Usage: python app.py /path/to/zotero.sqlite")
+    print("Usage: python zotero_viewer.py /path/to/zotero.sqlite")
     sys.exit(1)
 
 database_path = sys.argv[1]
