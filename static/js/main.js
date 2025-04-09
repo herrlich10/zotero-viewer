@@ -234,20 +234,29 @@ function initializeSelectAllCheckbox() {
     
     if (!selectAllCheckbox || itemCheckboxes.length === 0) return;
     
-    // Update select all checkbox state based on item checkboxes
+    // Update select all checkbox state based on visible item checkboxes
     function updateSelectAllCheckbox() {
-        const checkedCount = document.querySelectorAll('input[name="selected_items"]:checked').length;
+        // Only count visible items
+        const visibleCheckboxes = Array.from(itemCheckboxes).filter(checkbox => 
+            checkbox.closest('.item').style.display !== 'none'
+        );
         
-        if (checkedCount === 0) {
+        const checkedVisibleCount = visibleCheckboxes.filter(checkbox => checkbox.checked).length;
+        
+        if (visibleCheckboxes.length === 0) {
+            // No visible items
+            selectAllCheckbox.checked = false;
+            selectAllCheckbox.indeterminate = false;
+        } else if (checkedVisibleCount === 0) {
             // None selected
             selectAllCheckbox.checked = false;
             selectAllCheckbox.indeterminate = false;
-        } else if (checkedCount === itemCheckboxes.length) {
-            // All selected
+        } else if (checkedVisibleCount === visibleCheckboxes.length) {
+            // All visible selected
             selectAllCheckbox.checked = true;
             selectAllCheckbox.indeterminate = false;
         } else {
-            // Some selected
+            // Some visible selected
             selectAllCheckbox.checked = false;
             selectAllCheckbox.indeterminate = true;
         }
@@ -267,9 +276,12 @@ function initializeSelectAllCheckbox() {
         // Toggle based on current state
         const shouldCheck = !selectAllCheckbox.checked && !selectAllCheckbox.indeterminate;
         
-        // Update all checkboxes
+        // Only update visible checkboxes
         itemCheckboxes.forEach(checkbox => {
-            checkbox.checked = shouldCheck;
+            const item = checkbox.closest('.item');
+            if (item.style.display !== 'none') {
+                checkbox.checked = shouldCheck;
+            }
         });
         
         // Update the select-all checkbox state
@@ -290,9 +302,12 @@ function initializeSelectAllCheckbox() {
                 // Toggle based on current state
                 const shouldCheck = !selectAllCheckbox.checked && !selectAllCheckbox.indeterminate;
                 
-                // Update all checkboxes
+                // Only update visible checkboxes
                 itemCheckboxes.forEach(checkbox => {
-                    checkbox.checked = shouldCheck;
+                    const item = checkbox.closest('.item');
+                    if (item.style.display !== 'none') {
+                        checkbox.checked = shouldCheck;
+                    }
                 });
                 
                 // Update the select-all checkbox state
