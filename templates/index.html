@@ -116,34 +116,36 @@
                                 value="{{ item.id }}"
                                 id="item_{{ item.id }}"
                                 onclick="event.stopPropagation()">
-                            <!-- Replace the commented out item-tags div with this version -->
-                            <div class="item-title"><strong>{{ item.title }}</strong></div>
-                            <div class="item-author">
-                                {% if item.author is string %}
-                                    {{ item.author }}
-                                {% elif item.author is iterable and item.author %}
-                                    {{ item.author|join(', ') }}
-                                {% else %}
-                                    Unknown author
-                                {% endif %}
-                            </div>
-                            <div class="item-metadata">
-                                {% if item.publication %}{{ item.publication }}{% endif %}
-                                {% if item.publication and (item.date or item.dateAdded) %} | {% endif %}
-                                {% if item.date %}Published: {{ item.date }}{% endif %}
-                                {% if item.date and item.dateAdded %} | {% endif %}
-                                {% if item.dateAdded %}Added: {{ item.dateAdded }}{% endif %}
-                            </div>
-                            <div class="item-tags">
-                                Tags: 
-                                {% for tag in item.tags %}
-                                    <span class="tag">
-                                        {{ tag }}
-                                        <!-- Update the onclick attribute in the close-tag button -->
-                                        <button type="button" class="close-tag" title="Remove tag" 
-                                                onclick="removeTag('{{ tag }}', {{ item.id }}, event)">&times;</button>
-                                    </span>
-                                {% endfor %}
+                            <div class="item-content">
+                                <!-- Replace the commented out item-tags div with this version -->
+                                <div class="item-title"><strong>{{ item.title }}</strong></div>
+                                <div class="item-author">
+                                    {% if item.author is string %}
+                                        {{ item.author }}
+                                    {% elif item.author is iterable and item.author %}
+                                        {{ item.author|join(', ') }}
+                                    {% else %}
+                                        Unknown author
+                                    {% endif %}
+                                </div>
+                                <div class="item-metadata">
+                                    {% if item.publication %}{{ item.publication }}{% endif %}
+                                    {% if item.publication and (item.date or item.dateAdded) %} | {% endif %}
+                                    {% if item.date %}Published: {{ item.date }}{% endif %}
+                                    {% if item.date and item.dateAdded %} | {% endif %}
+                                    {% if item.dateAdded %}Added: {{ item.dateAdded }}{% endif %}
+                                </div>
+                                <div class="item-tags">
+                                    Tags: 
+                                    {% for tag in item.tags %}
+                                        <span class="tag">
+                                            {{ tag }}
+                                            <!-- Update the onclick attribute in the close-tag button -->
+                                            <button type="button" class="close-tag" title="Remove tag" 
+                                                    onclick="removeTag('{{ tag }}', {{ item.id }}, event)">&times;</button>
+                                        </span>
+                                    {% endfor %}
+                                </div>
                             </div>
                         </div>
                     {% endfor %}
