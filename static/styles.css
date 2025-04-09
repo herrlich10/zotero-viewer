@@ -365,3 +365,25 @@ input[type="text"] {
     font-size: 0.9em;
     margin-bottom: 5px;
 }
+
+/* Add styles for item tags to make them smaller */
+.item-tags {
+    margin-top: 3px;
+    line-height: 1.2;
+}
+
+.item-tags .tag {
+    font-size: 0.8em;
+    padding: 2px 6px;
+    margin: 1px 2px;
+    line-height: 1;
+    display: inline-flex;
+    align-items: center;
+    height: 20px;
+}
+
+.item-tags .close-tag {
+    font-size: 0.9em;
+    padding: 0;
+    margin-left: 3px;
+}
