@@ -4,6 +4,7 @@ import sys, os
 import re  # Add this import for regex splitting
 from collections import defaultdict
 import functools
+from datetime import datetime
 
 # Connect to database
 if len(sys.argv) < 2:
@@ -56,14 +57,25 @@ def get_items_and_tags(connection):
     for row in cursor.fetchall():
         item_id = row['itemID']
         if item_id not in items_dict:
+            # Format the date field to a readable format
+            date = row['date']
+            if date:
+                datestr = date.split(' ')[0]
+                Y, m, d = datestr.split('-')
+                if m == '00' and d == '00':
+                    date = Y
+                elif d == '00':
+                    date = f"{Y}-{m}"
+                else:
+                    date = f"{Y}-{m}-{d}"
+
             # Format the dateAdded field to a readable format
             date_added = row['dateAdded']
             if date_added:
-                # Convert from Zotero's format (2023-01-01T12:00:00Z) to readable format
+                # Convert from Zotero's format (2023-01-01 12:00:00) to readable format
                 try:
-                    from datetime import datetime
-                    dt = datetime.strptime(date_added, '%Y-%m-%dT%H:%M:%SZ')
-                    date_added = dt.strftime('%Y-%m-%d')
+                    dt = datetime.strptime(date_added, '%Y-%m-%d %H:%M:%S')
+                    date_added = dt.strftime('%Y-%m-%d %H:%M:%S')
                 except:
                     # If parsing fails, keep the original format
                     pass
@@ -72,7 +84,7 @@ def get_items_and_tags(connection):
                 'id': item_id,
                 'title': row['title'] or 'Untitled',
                 'author': [],  # Initialize as empty list to store multiple authors
-                'date': row['date'] or 'No date',
+                'date': date or 'No date',
                 'dateAdded': date_added or 'Unknown',
                 'publication': row['publication'] or '',
                 'abstract': row['abstract'] or '',  # Store abstract but don't display yet
