@@ -14,6 +14,13 @@ function toggleTag(tagName) {
         params.append('tag', tagName);
     }
     
+    // Save current search value before page reload
+    const searchInput = document.getElementById('item-search');
+    if (searchInput && searchInput.value) {
+        // Store the search value in localStorage
+        localStorage.setItem('savedSearchValue', searchInput.value);
+    }
+    
     // Update URL and reload page
     url.search = params.toString();
     window.location.href = url.toString();
@@ -394,4 +401,19 @@ document.addEventListener('DOMContentLoaded', function() {
             renameTag(tagName);
         });
     });
+    
+    // Restore search value from localStorage if it exists
+    const searchInput = document.getElementById('item-search');
+    if (searchInput && localStorage.getItem('savedSearchValue')) {
+        searchInput.value = localStorage.getItem('savedSearchValue');
+        
+        // Make sure the item-search.js has loaded before triggering the search
+        setTimeout(() => {
+            // Trigger the input event to apply the search
+            searchInput.dispatchEvent(new Event('input'));
+            
+            // Clear the saved search value after it's been applied
+            localStorage.removeItem('savedSearchValue');
+        }, 100);
+    }
 });
