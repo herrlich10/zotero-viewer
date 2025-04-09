@@ -359,3 +359,9 @@ input[type="text"] {
     border-radius: 3px;
     font-size: 0.9em;
 }
+
+.item-metadata {
+    color: #666;
+    font-size: 0.9em;
+    margin-bottom: 5px;
+}
