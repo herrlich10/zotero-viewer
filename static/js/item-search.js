@@ -20,6 +20,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 item.style.display = '';
             });
             updateItemCount(items.length);
+            
+            // Update tag cloud to show all tags
+            updateTagCloudForVisibleItems(null);
             return;
         }
         
@@ -27,6 +30,7 @@ document.addEventListener('DOMContentLoaded', function() {
         const searchTerms = searchValue.split(/[,;]/).map(term => term.trim().toLowerCase()).filter(term => term);
         
         let visibleCount = 0;
+        let visibleItems = [];
         
         // Filter items based on search terms (AND relation)
         items.forEach(item => {
@@ -52,6 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
             if (allTermsFound) {
                 item.style.display = '';
                 visibleCount++;
+                visibleItems.push(item);
             } else {
                 item.style.display = 'none';
             }
@@ -59,6 +64,9 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Update the item count
         updateItemCount(visibleCount);
+        
+        // Update tag cloud to only show tags from visible items
+        updateTagCloudForVisibleItems(visibleItems);
     }
     
     // Function to update the item count
@@ -66,6 +74,34 @@ document.addEventListener('DOMContentLoaded', function() {
         const countElement = document.getElementById('item-count');
         if (countElement) {
             countElement.textContent = count;
+        }
+    }
+    
+    // Function to update tag cloud based on visible items
+    function updateTagCloudForVisibleItems(visibleItems) {
+        // If null is passed, it means show all tags (no filtering)
+        if (visibleItems === null) {
+            // Call the global function to reset tag cloud
+            if (typeof resetTagCloudVisibility === 'function') {
+                resetTagCloudVisibility();
+            }
+            return;
+        }
+        
+        // Collect all tags from visible items
+        const visibleTags = new Set();
+        visibleItems.forEach(item => {
+            const tagElements = item.querySelectorAll('.item-tags .tag');
+            tagElements.forEach(tagEl => {
+                // Get only the text content of the tag, excluding the close button
+                const tagText = tagEl.childNodes[0].textContent.trim();
+                visibleTags.add(tagText);
+            });
+        });
+        
+        // Call the global function to update tag cloud visibility
+        if (typeof updateTagCloudVisibility === 'function') {
+            updateTagCloudVisibility(visibleTags);
         }
     }
     

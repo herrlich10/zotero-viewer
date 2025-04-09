@@ -309,6 +309,52 @@ function initializeSelectAllCheckbox() {
     updateSelectAllCheckbox();
 }
 
+// New function to update tag cloud visibility based on visible items
+function updateTagCloudVisibility(visibleTags) {
+    const tagCloud = document.getElementById('tag-cloud');
+    if (!tagCloud) return;
+    
+    const tagElements = tagCloud.querySelectorAll('.tag');
+    
+    tagElements.forEach(tagEl => {
+        // Extract tag name (without the count)
+        const tagText = tagEl.textContent.trim();
+        const tagName = tagText.replace(/\s*\(\d+\)$/, '');
+        
+        // Show/hide based on whether this tag is in the visible tags set
+        if (visibleTags.has(tagName)) {
+            tagEl.style.display = '';
+        } else {
+            tagEl.style.display = 'none';
+        }
+    });
+}
+
+// New function to reset tag cloud visibility (show all tags)
+function resetTagCloudVisibility() {
+    const tagCloud = document.getElementById('tag-cloud');
+    if (!tagCloud) return;
+    
+    const tagElements = tagCloud.querySelectorAll('.tag');
+    
+    tagElements.forEach(tagEl => {
+        tagEl.style.display = '';
+    });
+    
+    // Re-apply any existing tag filter
+    const tagFilter = document.getElementById('tag-filter');
+    if (tagFilter && tagFilter.value) {
+        const filterText = tagFilter.value.toLowerCase();
+        
+        tagElements.forEach(tag => {
+            const tagText = tag.textContent.toLowerCase();
+            if (!tagText.includes(filterText)) {
+                tag.style.display = 'none';
+            }
+        });
+    }
+}
+
 // Add this single consolidated DOMContentLoaded event listener at the end of the file:
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize tag filter and sort
