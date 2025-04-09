@@ -81,11 +81,18 @@
             </div>
         </div>
         
+        <!-- Move the search container to the top of the main content -->
         <div class="main-content">
+            <!-- Search bar moved to the top -->
+            <div class="search-container">
+                <input type="text" id="item-search" placeholder="Search items..." class="search-input">
+                <button id="clear-search" class="clear-search-button" title="Clear search">×</button>
+            </div>
+        
             <!-- Empty filter controls div - Active filters section removed -->
             <div class="filter-controls">
             </div>
-
+        
             <!-- Find the form for adding tags and add an ID -->
             <form method="post" id="add-tag-form">
                 <div class="bulk-controls">
@@ -101,13 +108,8 @@
                     <div id="common-tags-list"></div>
                 </div>
                 
-                <!-- Add this right after the bulk-controls div and before the common-tags-container -->
-                <div class="search-container">
-                    <input type="text" id="item-search" placeholder="Search items..." class="search-input">
-                    <button id="clear-search" class="clear-search-button" title="Clear search">×</button>
-                </div>
+                <!-- Search container was here before -->
                 
-                <!-- Update the References heading to include a dynamic count -->
                 <h2>References (<span id="item-count">{{ items|length }}</span>)</h2>
                 <div class="select-all-container">
                     <input type="checkbox" id="select-all-checkbox">
