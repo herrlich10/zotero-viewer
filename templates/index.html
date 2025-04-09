@@ -105,6 +105,16 @@
                 <div class="select-all-container">
                     <input type="checkbox" id="select-all-checkbox">
                     <label for="select-all-checkbox">Select All</label>
+                    
+                    <!-- Add sorting options -->
+                    <div class="sort-options">
+                        <span>Sort by:</span>
+                        <a href="#" class="sort-label" data-sort="title">Title</a>
+                        <a href="#" class="sort-label" data-sort="author">Author</a>
+                        <a href="#" class="sort-label" data-sort="year">Year</a>
+                        <a href="#" class="sort-label" data-sort="publication">Journal</a>
+                        <a href="#" class="sort-label" data-sort="dateAdded">Added Date</a>
+                    </div>
                 </div>
                 {% if items %}
                     <!-- Add data-item-id attribute to each item div and make them double-clickable -->
@@ -169,5 +179,6 @@
     <script src="{{ url_for('static', filename='js/tag-operations.js') }}"></script>
     <script src="{{ url_for('static', filename='js/attachment-handler.js') }}"></script>
     <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/item-sorter.js') }}"></script>
 </body>
 </html>

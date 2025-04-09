@@ -399,3 +399,51 @@ input[type="text"] {
     padding: 0;
     margin-left: 3px;
 }
+
+/* Add styles for the sorting options */
+.select-all-container {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.select-all-container input[type="checkbox"] {
+    margin-right: 8px;
+}
+
+.select-all-container label {
+    cursor: pointer;
+}
+
+.sort-options {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    background-color: #f5f5f5;
+    padding: 5px 10px;
+    border-radius: 4px;
+    font-size: 0.9em;
+}
+
+.sort-options span {
+    color: #666;
+}
+
+.sort-label {
+    color: #007bff;
+    text-decoration: none;
+    cursor: pointer;
+    padding: 2px 5px;
+    border-radius: 3px;
+}
+
+.sort-label:hover {
+    background-color: #e9ecef;
+}
+
+.sort-label.active {
+    font-weight: bold;
+    background-color: #e9ecef;
+}
