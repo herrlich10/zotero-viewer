@@ -719,11 +719,20 @@ def add_tags():
 
 @click.command()
 @click.argument('database', type=click.Path(exists=True))
-@click.option('--host', default='127.0.0.1', help='Host to bind the server to')
-@click.option('--port', default=5000, help='Port to bind the server to')
-@click.option('--debug', is_flag=True, help='Run in debug mode')
+@click.option('--host', default='127.0.0.1', help='Host to bind the server to (default: 127.0.0.1)')
+@click.option('--port', default=5000, help='Port to bind the server to (default: 5000)')
+@click.option('--debug', is_flag=True, help='Run in debug mode (default: False)')
 def main(database, host, port, debug):
-    """Run the Zotero Viewer web application."""
+    """Run the Zotero Viewer web application.
+    
+    DATABASE: Path to your Zotero SQLite database file (required)
+    
+    Example usage:
+    
+    zotero-viewer /path/to/zotero.sqlite
+    
+    zotero-viewer /path/to/zotero.sqlite --host 0.0.0.0 --port 8080 --debug
+    """
     global database_path, conn, all_items
     
     database_path = database
