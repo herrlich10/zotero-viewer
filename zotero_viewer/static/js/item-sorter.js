@@ -9,10 +9,10 @@ document.addEventListener('DOMContentLoaded', function() {
         originalLabelText[label.getAttribute('data-sort')] = label.textContent;
     });
     
-    // Current sort state
+    // Current sort state - initialize with dateAdded and desc direction
     let currentSort = {
-        field: null,
-        direction: 'asc'
+        field: 'dateAdded',
+        direction: 'desc'
     };
     
     // Add click event to each sort label
@@ -135,4 +135,8 @@ document.addEventListener('DOMContentLoaded', function() {
             itemsContainer.appendChild(item);
         });
     }
+    
+    // Apply default sort on page load (dateAdded, desc)
+    updateSortUI('dateAdded', 'desc');
+    sortItems('dateAdded', 'desc');
 });
