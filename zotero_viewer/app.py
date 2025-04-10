@@ -1,19 +1,20 @@
 import sqlite3
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import sys, os
-import re  # Add this import for regex splitting
+import re
 from collections import defaultdict
 import functools
 from datetime import datetime
+import click
 
-# Connect to database
-if len(sys.argv) < 2:
-    print("Usage: python zotero_viewer.py /path/to/zotero.sqlite")
-    sys.exit(1)
+# Create Flask application
+app = Flask(__name__)
+app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)
 
-database_path = sys.argv[1]
-conn = sqlite3.connect(database_path)
-conn.row_factory = sqlite3.Row
+# Global variables
+database_path = None
+conn = None
+all_items = []
 
 def get_items_and_tags(connection):
     """Retrieve main items with metadata and tags using provided connection"""
@@ -139,10 +140,7 @@ def get_items_and_tags(connection):
     
     return list(items_dict.values())
 
-# Preload all items and tags
-all_items = get_items_and_tags(conn)
-
-# Modify the with_transaction decorator
+# Decorator for database transactions
 def with_transaction(func):
     @functools.wraps(func)
     def wrapper(*args, **kwargs):
@@ -224,12 +222,7 @@ def remove_tag_from_item(conn, tag_name, item_id):  # Accept conn as first param
     
     return True
 
-
-# Make sure this line is at the top of your app.py file
-app = Flask(__name__, static_folder='static')
-app.secret_key = os.environ.get('FLASK_SECRET_KEY') or os.urandom(24)  # Best practice
-
-# Update the route to handle POST with multiple tags and return JSON for AJAX requests
+# Routes
 @app.route('/', methods=['GET', 'POST'])
 def index():
     if request.method == 'POST':
@@ -723,9 +716,25 @@ def add_tags():
             'message': f'Error: {str(e)}'
         })
 
-# Make sure to include the new JavaScript file in your template
-# Add this to the bottom of your index.html before the closing </body> tag:
-# <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
+
+@click.command()
+@click.argument('database', type=click.Path(exists=True))
+@click.option('--host', default='127.0.0.1', help='Host to bind the server to')
+@click.option('--port', default=5000, help='Port to bind the server to')
+@click.option('--debug', is_flag=True, help='Run in debug mode')
+def main(database, host, port, debug):
+    """Run the Zotero Viewer web application."""
+    global database_path, conn, all_items
+    
+    database_path = database
+    conn = sqlite3.connect(database_path)
+    conn.row_factory = sqlite3.Row
+    
+    # Load all items at startup
+    all_items = get_items_and_tags(conn)
+    
+    # Run the Flask app
+    app.run(host=host, port=port, debug=debug)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    main()

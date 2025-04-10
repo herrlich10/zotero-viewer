@@ -1,0 +1,4 @@
+include README.md
+include LICENSE
+recursive-include zotero_viewer/static *
+recursive-include zotero_viewer/templates *
