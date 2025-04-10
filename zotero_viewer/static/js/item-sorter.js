@@ -70,8 +70,26 @@ document.addEventListener('DOMContentLoaded', function() {
                 valueA = a.querySelector('.item-title').textContent.trim().toLowerCase();
                 valueB = b.querySelector('.item-title').textContent.trim().toLowerCase();
             } else if (field === 'author') {
-                valueA = a.querySelector('.item-author').textContent.trim().toLowerCase();
-                valueB = b.querySelector('.item-author').textContent.trim().toLowerCase();
+                // Get full author text
+                const authorTextA = a.querySelector('.item-author').textContent.trim();
+                const authorTextB = b.querySelector('.item-author').textContent.trim();
+                
+                // Extract last name for sorting
+                // For multiple authors, use the first author's last name
+                const getLastName = (authorText) => {
+                    // If there are multiple authors (separated by comma)
+                    if (authorText.includes(',')) {
+                        // Get the first author
+                        authorText = authorText.split(',')[0].trim();
+                    }
+                    
+                    // Split by spaces and get the last part as the last name
+                    const parts = authorText.split(' ');
+                    return parts[parts.length - 1].toLowerCase();
+                };
+                
+                valueA = getLastName(authorTextA);
+                valueB = getLastName(authorTextB);
             } else if (field === 'year') {
                 // Extract year from date if available
                 const dateTextA = a.querySelector('.item-metadata').textContent;
