@@ -1,17 +1,38 @@
+/* Container and layout */
 .container { 
     display: flex; 
-    margin: 10px; /* Reduced from 20px */
-    gap: 20px; /* Reduced from 30px */
+    margin: 10px;
+    gap: 20px;
+    height: 100vh;
+    width: 100%;
 }
 
+/* Sidebar styles */
 .sidebar { 
-    width: 250px; 
+    width: 280px;
+    flex-shrink: 0;
+    overflow-y: auto;
+    border-right: 1px solid #ddd;
+    padding: 8px;
 }
 
+/* Main content area */
 .main-content { 
-    flex-grow: 1; 
+    flex: 2;
+    overflow-y: auto;
+    padding: 8px;
+    border-right: 1px solid #ddd;
 }
 
+/* Details panel */
+.details-panel {
+    flex: 1;
+    overflow-y: auto;
+    padding: 8px;
+    background-color: #f9f9f9;
+}
+
+/* Tag styles */
 .tag {
     display: inline-block;
     cursor: pointer;
@@ -22,7 +43,18 @@
     border: 1px solid #ddd;
 }
 
-/* Add close button styles */
+.selected-tag {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.tag-highlight {
+    background-color: #ffffc0;
+    border-color: #e6e600;
+}
+
+/* Close button styles */
 .close-tag {
     background: none;
     border: none;
@@ -37,470 +69,21 @@
     color: #dc3545;
 }
 
-.selected-tag {
-    background: #007bff;
-    color: white;
-    border-color: #007bff;
-}
-
-.item {
-    padding: 10px; /* Reduced from 15px */
-    margin-bottom: 10px; /* Reduced from 15px */
-    border: 1px solid #eee;
-    border-radius: 5px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.filter-controls {
-    margin-bottom: 10px; /* Reduced from 20px */
-    display: flex;
-    gap: 10px;
-    align-items: center;
-}
-
-.clear-filter-container {
-    margin: 5px 0; /* Reduced from 10px 0 */
-    text-align: center;
-}
-
-.clear-filter {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    width: 100%;
-}
-
-.clear-filter:hover {
-    background-color: #d32f2f;
-}
-
-.bulk-tag-form {
-    margin-bottom: 10px; /* Reduced from 20px */
-}
-
-/* After the bulk-controls class */
-.bulk-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px; /* Reduced from 15px */
-}
-
-/* Add styles for common tags display */
-/* Add these styles for the common tags container */
-.common-tags-container {
-    min-height: 30px;  /* Reduced from 40px */
-    margin-bottom: 10px; /* Reduced from 15px */
-    display: flex;
-    align-items: center;
-    visibility: hidden;
-}
-
-/* When the container is active, make it visible but keep the same space */
-.common-tags-container.active {
-    visibility: visible;
-}
-
-/* Style for the common tags list */
-#common-tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.common-tags-label {
-    font-size: 0.9em;
-    color: #666;
-    margin-right: 5px;
-}
-
-.common-tag {
-    display: inline-flex;
-    align-items: center;
-    background: #e9ecef;
-    border: 1px solid #ced4da;
-    border-radius: 15px;
-    padding: 3px 10px;
-    font-size: 0.85em;
-    margin: 2px;
-}
-
-.remove-common-tag {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 0 0.25rem;
-    margin-left: 0.25rem;
-}
-
-.remove-common-tag:hover {
-    color: #dc3545;
-}
-
-input[type="text"] {
-    padding: 8px;
-    flex-grow: 1;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.add-tag-button {
-    padding: 8px 15px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.item input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.alert {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-}
-
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-
-/* 标签云容器样式 */
-.tag-cloud-container {
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-/* 标签控件样式 */
-/* Adjust sidebar width to accommodate controls */
-.sidebar { 
-    width: 280px; /* Increased from 250px */
-}
-
-/* Tag controls style */
-.tag-controls {
-    display: flex;
-    gap: 5px; /* Reduced from 10px */
-    margin-bottom: 10px;
-    align-items: center;
-    width: 100%; /* Ensure the container takes full width */
-}
-
-.tag-filter {
-    flex-grow: 1;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    height: 36px;
-    box-sizing: border-box;
-    font-size: 0.9em; /* Slightly smaller font */
-    width: calc(100% - 115px); /* Adjust width to leave space for the dropdown */
-}
-
-.tag-sort {
-    padding: 6px; /* Reduced padding */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-    height: 36px;
-    box-sizing: border-box;
-    width: 110px; /* Fixed width */
-    font-size: 0.9em; /* Slightly smaller font */
-}
-
-/* Ensure tag cloud container and clear filter have the same width */
-.tag-cloud-container, .clear-filter-container {
-    width: 100%;
-    box-sizing: border-box; /* Include padding in width calculation */
-}
-
-.clear-filter {
-    background-color: #f44336;
-    color: white;
-    border: none;
-    padding: 5px 10px;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.9em;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.clear-filter:hover {
-    background-color: #d32f2f;
-}
-
-.bulk-tag-form {
-    margin-bottom: 10px; /* Reduced from 20px */
-}
-
-/* After the bulk-controls class */
-.bulk-controls {
-    display: flex;
-    gap: 10px;
-    margin-bottom: 10px; /* Reduced from 15px */
-}
-
-/* Add styles for common tags display */
-/* Add these styles for the common tags container */
-.common-tags-container {
-    min-height: 30px;  /* Reduced from 40px */
-    margin-bottom: 10px; /* Reduced from 15px */
-    display: flex;
-    align-items: center;
-    visibility: hidden;
-}
-
-/* When the container is active, make it visible but keep the same space */
-.common-tags-container.active {
-    visibility: visible;
-}
-
-/* Style for the common tags list */
-#common-tags-list {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.common-tags-label {
-    font-size: 0.9em;
-    color: #666;
-    margin-right: 5px;
-}
-
-.common-tag {
-    display: inline-flex;
-    align-items: center;
-    background: #e9ecef;
-    border: 1px solid #ced4da;
-    border-radius: 15px;
-    padding: 3px 10px;
-    font-size: 0.85em;
-    margin: 2px;
-}
-
-.remove-common-tag {
-    background: none;
-    border: none;
-    color: #666;
-    cursor: pointer;
-    font-weight: bold;
-    padding: 0 0.25rem;
-    margin-left: 0.25rem;
-}
-
-.remove-common-tag:hover {
-    color: #dc3545;
-}
-
-input[type="text"] {
-    padding: 8px;
-    flex-grow: 1;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-}
-
-.add-tag-button {
-    padding: 8px 15px;
-    background: #28a745;
-    color: white;
-    border: none;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.item input[type="checkbox"] {
-    margin-right: 10px;
-}
-
-.alert {
-    padding: 10px;
-    margin-bottom: 15px;
-    border-radius: 4px;
-}
-
-.alert-error {
-    background: #f8d7da;
-    color: #721c24;
-    border: 1px solid #f5c6cb;
-}
-
-.alert-success {
-    background: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
-}
-
-
-/* 标签云容器样式 */
-.tag-cloud-container {
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 10px;
-}
-
-/* 标签控件样式 */
-/* Adjust sidebar width to accommodate controls */
-.sidebar { 
-    width: 280px; /* Increased from 250px */
-}
-
-/* Tag controls style */
-.tag-controls {
-    display: flex;
-    gap: 5px; /* Reduced from 10px */
-    margin-bottom: 10px;
-    align-items: center;
-    width: 100%; /* Ensure the container takes full width */
-}
-
-.tag-filter {
-    flex-grow: 1;
-    padding: 8px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    height: 36px;
-    box-sizing: border-box;
-    font-size: 0.9em; /* Slightly smaller font */
-    width: calc(100% - 115px); /* Adjust width to leave space for the dropdown */
-}
-
-.tag-sort {
-    padding: 6px; /* Reduced padding */
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    background-color: white;
-    height: 36px;
-    box-sizing: border-box;
-    width: 110px; /* Fixed width */
-    font-size: 0.9em; /* Slightly smaller font */
-}
-
-/* Ensure tag cloud container matches sidebar width */
-.tag-cloud-container {
-    max-height: 400px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    border-radius: 5px;
-    padding: 10px;
-    margin-top: 10px;
-    box-sizing: border-box; /* Include padding in width calculation */
-    width: 100%; /* Ensure it takes full width of sidebar */
-}
-
-/* 美化滚动条 */
-.tag-cloud-container::-webkit-scrollbar {
-    width: 8px;
-}
-
-.tag-cloud-container::-webkit-scrollbar-track {
-    background: #f1f1f1;
-    border-radius: 4px;
-}
-
-.tag-cloud-container::-webkit-scrollbar-thumb {
-    background: #888;
-    border-radius: 4px;
-}
-
-.tag-cloud-container::-webkit-scrollbar-thumb:hover {
-    background: #555;
-}
-
-/* 标签高亮效果 */
-.tag-highlight {
-    background-color: #ffffc0;
-    border-color: #e6e600;
-}
-
-/* Add this to your existing CSS */
-.select-all-container {
-    margin-bottom: 15px;
-    display: flex;
-    align-items: center;
-}
-
-.select-all-container input[type="checkbox"] {
-    margin-right: 8px;
-}
-
-.select-all-container label {
-    cursor: pointer;
-}
-
-/* Add these styles to your existing CSS file */
-
-.container {
-    display: flex;
-    height: 100vh;
-    width: 100%;
-}
-
-.sidebar {
-    width: 250px;
-    flex-shrink: 0;
-    overflow-y: auto;
-    border-right: 1px solid #ddd;
-    padding: 8px; /* Reduced from 10px */
-}
-
-.main-content {
-    flex: 2;
-    overflow-y: auto;
-    padding: 8px; /* Reduced from 10px */
-    border-right: 1px solid #ddd;
-}
-
-.details-panel {
-    flex: 1;
-    overflow-y: auto;
-    padding: 8px; /* Reduced from 10px */
-    background-color: #f9f9f9;
-}
-
+/* Item styles */
 .item {
     cursor: pointer;
-    padding: 8px; /* Reduced from 10px */
-    margin-bottom: 8px; /* Reduced from 10px */
+    padding: 8px;
+    margin-bottom: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     transition: background-color 0.2s;
     display: flex;
     align-items: flex-start;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
 }
 
 .item-content {
     flex: 1;
-}
-
-.item input[type="checkbox"] {
-    margin-right: 10px;
-    margin-top: 3px;
-    align-self: top;
 }
 
 .item:hover {
@@ -512,38 +95,10 @@ input[type="text"] {
     border-color: #1890ff;
 }
 
-#item-details-content {
-    padding: 8px; /* Reduced from 10px */
-}
-
-.select-message {
-    color: #999;
-    text-align: center;
-    margin-top: 50px;
-}
-
-.detail-title {
-    font-size: 1.2em;
-    font-weight: bold;
-    margin-bottom: 8px; /* Reduced from 10px */
-}
-
-.detail-abstract {
-    margin: 10px 0; /* Reduced from 15px 0 */
-    line-height: 1.5;
-}
-
-.detail-tags {
-    margin-top: 10px; /* Reduced from 15px */
-}
-
-.detail-tag {
-    display: inline-block;
-    background-color: #f0f0f0;
-    padding: 3px 8px;
-    margin: 2px;
-    border-radius: 3px;
-    font-size: 0.9em;
+.item input[type="checkbox"] {
+    margin-right: 10px;
+    margin-top: 3px;
+    align-self: top;
 }
 
 .item-metadata {
@@ -552,9 +107,9 @@ input[type="text"] {
     margin-bottom: 5px;
 }
 
-/* Add styles for item tags to make them smaller */
+/* Item tags styles */
 .item-tags {
-    margin-top: 2px; /* Reduced from 3px */
+    margin-top: 2px;
     line-height: 1.2;
 }
 
@@ -574,9 +129,199 @@ input[type="text"] {
     margin-left: 3px;
 }
 
-/* Add styles for the sorting options */
+/* Filter controls */
+.filter-controls {
+    margin-bottom: 10px;
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.clear-filter-container {
+    margin: 5px 0;
+    text-align: center;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.clear-filter {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 5px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.9em;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.clear-filter:hover {
+    background-color: #d32f2f;
+}
+
+/* Bulk tagging controls */
+.bulk-tag-form {
+    margin-bottom: 10px;
+}
+
+.bulk-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+/* Common tags container */
+.common-tags-container {
+    min-height: 30px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    visibility: hidden;
+}
+
+.common-tags-container.active {
+    visibility: visible;
+}
+
+#common-tags-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.common-tags-label {
+    font-size: 0.9em;
+    color: #666;
+    margin-right: 5px;
+}
+
+.common-tag {
+    display: inline-flex;
+    align-items: center;
+    background: #e9ecef;
+    border: 1px solid #ced4da;
+    border-radius: 15px;
+    padding: 3px 10px;
+    font-size: 0.85em;
+    margin: 2px;
+}
+
+.remove-common-tag {
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 0 0.25rem;
+    margin-left: 0.25rem;
+}
+
+.remove-common-tag:hover {
+    color: #dc3545;
+}
+
+/* Form elements */
+input[type="text"] {
+    padding: 8px;
+    flex-grow: 1;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.add-tag-button {
+    padding: 8px 15px;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+}
+
+/* Alert styles */
+.alert {
+    padding: 10px;
+    margin-bottom: 15px;
+    border-radius: 4px;
+}
+
+.alert-error {
+    background: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+.alert-success {
+    background: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+/* Tag cloud container */
+.tag-cloud-container {
+    max-height: 400px;
+    overflow-y: auto;
+    border: 1px solid #eee;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    box-sizing: border-box;
+    width: 100%;
+}
+
+/* Tag controls */
+.tag-controls {
+    display: flex;
+    gap: 5px;
+    margin-bottom: 10px;
+    align-items: center;
+    width: 100%;
+}
+
+.tag-filter {
+    flex-grow: 1;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    height: 36px;
+    box-sizing: border-box;
+    font-size: 0.9em;
+    width: calc(100% - 115px);
+}
+
+.tag-sort {
+    padding: 6px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: white;
+    height: 36px;
+    box-sizing: border-box;
+    width: 110px;
+    font-size: 0.9em;
+}
+
+/* Scrollbar styles */
+.tag-cloud-container::-webkit-scrollbar {
+    width: 8px;
+}
+
+.tag-cloud-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 4px;
+}
+
+.tag-cloud-container::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+.tag-cloud-container::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}
+
+/* Select all container */
 .select-all-container {
-    margin-bottom: 10px; /* Reduced from 15px */
+    margin-bottom: 10px;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -590,6 +335,7 @@ input[type="text"] {
     cursor: pointer;
 }
 
+/* Sort options */
 .sort-options {
     display: flex;
     align-items: center;
@@ -622,11 +368,10 @@ input[type="text"] {
     background-color: #e9ecef;
 }
 
-/* Add styles for the search box */
-/* Update styles for the search box to make it more prominent at the top */
+/* Search box */
 .search-container {
     display: flex;
-    margin-bottom: 10px; /* Reduced from 20px */
+    margin-bottom: 10px;
     position: relative;
 }
 
@@ -663,14 +408,68 @@ input[type="text"] {
     color: #333;
 }
 
-/* Styles for the references header and refresh button */
+/* Item details */
+#item-details-content {
+    padding: 8px;
+}
+
+.select-message {
+    color: #999;
+    text-align: center;
+    margin-top: 50px;
+}
+
+.detail-title {
+    font-size: 1.2em;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.detail-abstract {
+    margin: 10px 0;
+    line-height: 1.5;
+}
+
+.detail-tags {
+    margin-top: 10px;
+}
+
+.detail-tag {
+    display: inline-block;
+    background-color: #f0f0f0;
+    padding: 3px 8px;
+    margin: 2px;
+    border-radius: 3px;
+    font-size: 0.9em;
+}
+
+/* References header */
 .references-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 5px; /* Reduced from 10px */
+    margin-bottom: 5px;
 }
 
+/* Tag header with count */
+.tag-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 5px;
+}
+
+.tag-header h3 {
+    margin: 0;
+}
+
+.tag-count {
+    font-size: 0.9em;
+    color: #666;
+    font-weight: normal;
+}
+
+/* Refresh button */
 .refresh-button {
     background-color: #f0f0f0;
     border: 1px solid #ccc;
