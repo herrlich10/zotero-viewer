@@ -45,7 +45,9 @@ The location of your Zotero database backup can typically be found at:
 - Windows: `C:\Users\[username]\Zotero\zotero.sqlite`
 - Linux: `/home/[username]/Zotero/zotero.sqlite`
 
-**Important**: Zotero Viewer and the Zotero desktop application cannot be used simultaneously with the same database file. Close Zotero before starting Zotero Viewer, and vice versa.
+**Important**: In principle, Zotero Viewer and the Zotero desktop application should not be used simultaneously with the same database file in order to avoid potential collisions. 
+
+In practice, based on limited testing, Zotero app can start up normally even when Zotero Viewer is running, and see the latest changes made by Zotero Viewer (as these changes are applied immediately to the database). When Zotero app is launched, the database is unlocked, and the Zotero Viewer can no longer access it until the app is closed. A data refresh (not web page refresh) is required to see the latest changes. However, it is not guaranteed that the two can always work properly, especially when the same item is edited by both at the same time.
 
 ## Installation
 
