@@ -1,4 +1,4 @@
-include README.md
 include LICENSE
-recursive-include zotero_viewer/static *
+include README.md
 recursive-include zotero_viewer/templates *
+recursive-include zotero_viewer/static *
