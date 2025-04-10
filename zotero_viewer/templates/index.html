@@ -110,7 +110,18 @@
                 
                 <!-- Search container was here before -->
                 
-                <h2>References (<span id="item-count">{{ items|length }}</span>)</h2>
+                <!-- Replace the existing h2 line with this -->
+                <div class="references-header">
+                    <h2>References (<span id="item-count">{{ items|length }}</span>)</h2>
+                    <form action="{{ url_for('refresh_data') }}" method="POST" id="refresh-form">
+                        {% for tag in selected_tags %}
+                        <input type="hidden" name="selected_tags" value="{{ tag }}">
+                        {% endfor %}
+                        <button type="submit" class="refresh-button" title="Reload data from database">
+                            Refresh Data
+                        </button>
+                    </form>
+                </div>
                 <div class="select-all-container">
                     <input type="checkbox" id="select-all-checkbox">
                     <label for="select-all-checkbox">Select All</label>

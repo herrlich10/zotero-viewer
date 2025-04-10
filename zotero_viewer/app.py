@@ -716,6 +716,42 @@ def add_tags():
             'message': f'Error: {str(e)}'
         })
 
+# Add a new route to handle data refresh
+@app.route('/refresh_data', methods=['POST'])
+def refresh_data():
+    try:
+        # Force reload of all items data from the database
+        global all_items
+        refresh_conn = sqlite3.connect(database_path)
+        refresh_conn.row_factory = sqlite3.Row
+        all_items = get_items_and_tags(refresh_conn)
+        refresh_conn.close()
+        
+        # Get the current selected tags from the request
+        selected_tags = request.form.getlist('selected_tags')
+        
+        # If this is an AJAX request, return JSON response
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({
+                'success': True,
+                'message': 'Data refreshed successfully'
+            })
+        
+        # Otherwise redirect back to the index with any selected tags
+        if selected_tags:
+            return redirect(url_for('index', tag=selected_tags))
+        else:
+            return redirect(url_for('index'))
+            
+    except Exception as e:
+        if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+            return jsonify({
+                'success': False,
+                'message': f'Error refreshing data: {str(e)}'
+            })
+        flash(f'Error refreshing data: {str(e)}', 'error')
+        return redirect(url_for('index'))
+
 
 @click.command()
 @click.argument('database', type=click.Path(exists=True))

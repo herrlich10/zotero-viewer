@@ -488,3 +488,25 @@ input[type="text"] {
 .clear-search-button:hover {
     color: #333;
 }
+
+/* Styles for the references header and refresh button */
+.references-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.refresh-button {
+    background-color: #f0f0f0;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 0.9em;
+    color: #333;
+}
+
+.refresh-button:hover {
+    background-color: #e0e0e0;
+}
