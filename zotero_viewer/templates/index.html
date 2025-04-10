@@ -47,7 +47,9 @@
 
     <div class="container">
         <div class="sidebar">
-            <h2>Available Tags</h2>
+            <div class="tag-header">
+                <h2>Available Tags (<span id="tag-count">{{ tag_counts|length }}</span>)</h2>
+            </div>
             
             <!-- Tag filtering and sorting controls -->
             <div class="tag-controls">
