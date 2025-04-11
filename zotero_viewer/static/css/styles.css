@@ -33,7 +33,23 @@ html, body {
     overflow-y: auto;
     padding: 8px;
     border-right: 1px solid #ddd;
-    box-sizing: border-box;
+    position: relative; /* Add this to establish positioning context */
+}
+
+/* Add this new section for the sticky controls */
+.reference-controls {
+    position: sticky;
+    top: 0;
+    background-color: white;
+    z-index: 10;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 10px;
+}
+
+/* Add a little padding to the items container */
+.items-container {
+    padding-top: 5px;
 }
 
 /* Details panel */

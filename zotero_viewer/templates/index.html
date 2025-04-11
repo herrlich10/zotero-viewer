@@ -58,106 +58,112 @@
       
       <!-- Move the search container to the top of the main content -->
       <div class="main-content">
-        <!-- Search bar moved to the top -->
-        <div class="search-container">
-          <input type="text" id="item-search" placeholder="Search titles, authors, abstracts, tags... (use , or ; for multiple terms with AND logic)" class="search-input">
-          <button id="clear-search" class="clear-search-button" title="Clear search">×</button>
-        </div>
-      
-        <!-- Empty filter controls div - Active filters section removed -->
-        <div class="filter-controls">
-        </div>
-      
-        <!-- Find the form for adding tags and add an ID -->
-        <form method="post" id="add-tag-form">
-          <div class="bulk-controls">
-            <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
-            <button type="submit" class="add-tag-button">
-              Add Tags to Selected
-            </button>
+        <!-- Wrap all controls in a sticky container -->
+        <div class="reference-controls">
+          <!-- Search bar moved to the top -->
+          <div class="search-container">
+            <input type="text" id="item-search" placeholder="Search titles, authors, abstracts, tags... (use , or ; for multiple terms with AND logic)" class="search-input">
+            <button id="clear-search" class="clear-search-button" title="Clear search">×</button>
           </div>
-        </form>
-            
-        <div class="common-tags-container" id="common-tags-container">
-          <span class="common-tags-label">Common tags:</span>
-          <div id="common-tags-list"></div>
-        </div>
-            
-        <!-- Search container was here before -->
-            
-        <!-- Replace the existing h2 line with this -->
-        <div class="references-header">
-          <h2>References (<span id="item-count">{{ items|length }}</span>)</h2>
-          <form action="{{ url_for('refresh_data') }}" method="POST" id="refresh-form">
-            {% for tag in selected_tags %}
-            <input type="hidden" name="selected_tags" value="{{ tag }}">
-            {% endfor %}
-            <button type="submit" class="refresh-button" title="Reload data from database">
-              Refresh Data
-            </button>
-          </form>
-        </div>
-        <div class="select-all-container">
-          <input type="checkbox" id="select-all-checkbox">
-          <label for="select-all-checkbox">Select All</label>
-          
-          <!-- Add sorting options -->
-          <div class="sort-options">
-            <span>Sort by:</span>
-            <a href="#" class="sort-label" data-sort="title">Title</a>
-            <a href="#" class="sort-label" data-sort="author">Author</a>
-            <a href="#" class="sort-label" data-sort="year">Year</a>
-            <a href="#" class="sort-label" data-sort="publication">Journal</a>
-            <a href="#" class="sort-label" data-sort="dateAdded">Added Date</a>
+        
+          <!-- Empty filter controls div - Active filters section removed -->
+          <div class="filter-controls">
           </div>
-        </div>
-        {% if items %}
-          <!-- Add data-item-id attribute to each item div and make them double-clickable -->
-          {% for item in items %}
-            <div class="item" data-item-id="{{ item.id }}" onclick="highlightItem(this, {{ item.id }})">
-              <!-- Ensure checkbox has correct name and value -->
-              <input type="checkbox" 
-                  name="selected_items" 
-                  value="{{ item.id }}"
-                  id="item_{{ item.id }}"
-                  onclick="event.stopPropagation()">
-              <div class="item-content">
-                <!-- Replace the commented out item-tags div with this version -->
-                <div class="item-title"><strong>{{ item.title }}</strong></div>
-                <div class="item-author">
-                  {% if item.author is string %}
-                    {{ item.author }}
-                  {% elif item.author is iterable and item.author %}
-                    {{ item.author|join(', ') }}
-                  {% else %}
-                    Unknown author
-                  {% endif %}
-                </div>
-                <div class="item-metadata">
-                  {% if item.publication %}{{ item.publication }}{% endif %}
-                  {% if item.publication and (item.date or item.dateAdded) %} | {% endif %}
-                  {% if item.date %}Published: {{ item.date }}{% endif %}
-                  {% if item.date and item.dateAdded %} | {% endif %}
-                  {% if item.dateAdded %}Added: {{ item.dateAdded }}{% endif %}
-                </div>
-                <div class="item-tags">
-                  Tags: 
-                  {% for tag in item.tags %}
-                    <span class="tag">
-                      {{ tag }}
-                      <!-- Update the onclick attribute in the close-tag button -->
-                      <button type="button" class="close-tag" title="Remove tag" 
-                              onclick="removeTag('{{ tag }}', {{ item.id }}, event)">&times;</button>
-                    </span>
-                  {% endfor %}
-                </div>
-              </div>
+        
+          <!-- Find the form for adding tags and add an ID -->
+          <form method="post" id="add-tag-form">
+            <div class="bulk-controls">
+              <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
+              <button type="submit" class="add-tag-button">
+                Add Tags to Selected
+              </button>
             </div>
-          {% endfor %}
-        {% else %}
-          <p>No items found matching the selected tags.</p>
-        {% endif %}
-      </div>
+          </form>
+              
+          <div class="common-tags-container" id="common-tags-container">
+            <span class="common-tags-label">Common tags:</span>
+            <div id="common-tags-list"></div>
+          </div>
+              
+          <!-- Replace the existing h2 line with this -->
+          <div class="references-header">
+            <h2>References (<span id="item-count">{{ items|length }}</span>)</h2>
+            <form action="{{ url_for('refresh_data') }}" method="POST" id="refresh-form">
+              {% for tag in selected_tags %}
+              <input type="hidden" name="selected_tags" value="{{ tag }}">
+              {% endfor %}
+              <button type="submit" class="refresh-button" title="Reload data from database">
+                Refresh Data
+              </button>
+            </form>
+          </div>
+          <div class="select-all-container">
+            <input type="checkbox" id="select-all-checkbox">
+            <label for="select-all-checkbox">Select All</label>
+            
+            <!-- Add sorting options -->
+            <div class="sort-options">
+              <span>Sort by:</span>
+              <a href="#" class="sort-label" data-sort="title">Title</a>
+              <a href="#" class="sort-label" data-sort="author">Author</a>
+              <a href="#" class="sort-label" data-sort="year">Year</a>
+              <a href="#" class="sort-label" data-sort="publication">Journal</a>
+              <a href="#" class="sort-label" data-sort="dateAdded">Added Date</a>
+            </div>
+          </div> <!-- Close the select-all-container div -->
+        </div> <!-- Close the reference-controls div -->
+        
+        <!-- Add a container for the items -->
+        <div class="items-container">
+          {% if items %}
+            <!-- Add data-item-id attribute to each item div and make them double-clickable -->
+            {% for item in items %}
+              <div class="item" data-item-id="{{ item.id }}" onclick="highlightItem(this, {{ item.id }})">
+                <!-- Rest of the item content remains unchanged -->
+                <!-- Ensure checkbox has correct name and value -->
+                <input type="checkbox" 
+                    name="selected_items" 
+                    value="{{ item.id }}"
+                    id="item_{{ item.id }}"
+                    onclick="event.stopPropagation()">
+                <div class="item-content">
+                  <!-- Replace the commented out item-tags div with this version -->
+                  <div class="item-title"><strong>{{ item.title }}</strong></div>
+                  <div class="item-author">
+                    {% if item.author is string %}
+                      {{ item.author }}
+                    {% elif item.author is iterable and item.author %}
+                      {{ item.author|join(', ') }}
+                    {% else %}
+                      Unknown author
+                    {% endif %}
+                  </div>
+                  <div class="item-metadata">
+                    {% if item.publication %}{{ item.publication }}{% endif %}
+                    {% if item.publication and (item.date or item.dateAdded) %} | {% endif %}
+                    {% if item.date %}Published: {{ item.date }}{% endif %}
+                    {% if item.date and item.dateAdded %} | {% endif %}
+                    {% if item.dateAdded %}Added: {{ item.dateAdded }}{% endif %}
+                  </div>
+                  <div class="item-tags">
+                    Tags: 
+                    {% for tag in item.tags %}
+                      <span class="tag">
+                        {{ tag }}
+                        <!-- Update the onclick attribute in the close-tag button -->
+                        <button type="button" class="close-tag" title="Remove tag" 
+                                onclick="removeTag('{{ tag }}', {{ item.id }}, event)">&times;</button>
+                      </span>
+                    {% endfor %}
+                  </div>
+                </div> <!-- Close the item-content div -->
+              </div> <!-- Close the item div -->
+            {% endfor %}
+          {% else %}
+            <p>No items found matching the selected tags.</p>
+          {% endif %}
+        </div> <!-- Close the items-container div -->
+      </div> <!-- Close the main-content div -->
       
       <!-- New details panel column -->
       <div class="details-panel">
