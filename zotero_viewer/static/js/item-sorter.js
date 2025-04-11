@@ -28,7 +28,11 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // New field, set to ascending by default
                 currentSort.field = sortField;
-                currentSort.direction = 'asc';
+                if (sortField === 'dateAdded' || sortField === 'year') {
+                    currentSort.direction = 'desc';
+                } else {
+                    currentSort.direction = 'asc';
+                }
             }
             
             // Update UI to show active sort
