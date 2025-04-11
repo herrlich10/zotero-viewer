@@ -188,6 +188,9 @@ function initializeTagFilterAndSort() {
                 tag.style.display = '';
                 tag.classList.remove('tag-highlight');
             });
+            
+            // Trigger sort when clearing the filter
+            newTagSort.dispatchEvent(new Event('change'));
         } else {
             // Apply filter to available tags
             availableTags.forEach(tag => {
@@ -199,6 +202,9 @@ function initializeTagFilterAndSort() {
                     tag.style.display = 'none';
                 }
             });
+            
+            // Re-sort after filtering
+            newTagSort.dispatchEvent(new Event('change'));
         }
         
         // Update tag count to show only visible tags after filtering
@@ -211,17 +217,17 @@ function initializeTagFilterAndSort() {
         
         // Only sort tags that are currently visible
         const visibleTags = Array.from(tags).filter(tag => 
-            tag.style.display !== 'none' || tag.style.display === ''
+            tag.style.display !== 'none'
         );
-        
+
         visibleTags.sort((a, b) => {
             if (sortMethod === 'alpha') {
                 // Sort alphabetically
                 return a.textContent.localeCompare(b.textContent);
             } else {
-                // Sort by count
-                const countA = parseInt(a.getAttribute('data-count'));
-                const countB = parseInt(b.getAttribute('data-count'));
+                // Sort by count - use the current displayed count, not the original data-count
+                const countA = parseInt(a.textContent.trim().match(/\((\d+)\)$/)[1]);
+                const countB = parseInt(b.textContent.trim().match(/\((\d+)\)$/)[1]);
                 return countB - countA; // Descending order
             }
         });
@@ -264,7 +270,6 @@ function updateTagCloudVisibility(visibleTags, tagCounts) {
             
             // Update the tag count to reflect visible items
             if (tagCounts && tagCounts[tagName] !== undefined) {
-                // Make sure we're only setting the tag name once with the count
                 tagEl.textContent = `${tagName} (${tagCounts[tagName]})`;
             }
         } else {
@@ -275,6 +280,12 @@ function updateTagCloudVisibility(visibleTags, tagCounts) {
     
     // Update tag count after search filtering
     updateVisibleTagCount();
+    
+    // Re-sort tags based on current sort method
+    const tagSort = document.getElementById('tag-sort');
+    if (tagSort) {
+        tagSort.dispatchEvent(new Event('change'));
+    }
 }
 
 // New function to reset tag cloud visibility (show all tags)

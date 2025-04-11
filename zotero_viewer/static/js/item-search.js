@@ -23,6 +23,14 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Update tag cloud to show all tags
             updateTagCloudForVisibleItems(null);
+            
+            // Explicitly trigger tag sorting when search is cleared
+            const tagSort = document.getElementById('tag-sort');
+            if (tagSort) {
+                setTimeout(() => {
+                    tagSort.dispatchEvent(new Event('change'));
+                }, 10);
+            }
             return;
         }
         
@@ -127,7 +135,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (clearSearchButton) {
         clearSearchButton.addEventListener('click', function() {
             searchInput.value = '';
-            filterItems('');
+            filterItems('');  // This already includes the tag sorting trigger
             searchInput.focus();
         });
     }
