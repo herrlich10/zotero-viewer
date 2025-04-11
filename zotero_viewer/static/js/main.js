@@ -300,7 +300,8 @@ function resetTagCloudVisibility() {
         tagEl.removeAttribute('data-hidden-by-search');
         
         // Restore original count from data-count attribute
-        const tagName = tagEl.textContent.replace(/\s*\(\d+\)$/, '');
+        // trim() is important here to avoid duplicated count problem
+        const tagName = tagEl.textContent.trim().replace(/\s*\(\d+\)$/, '');
         const originalCount = tagEl.getAttribute('data-count');
         if (originalCount) {
             tagEl.textContent = `${tagName} (${originalCount})`;
