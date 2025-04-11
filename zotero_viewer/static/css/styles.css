@@ -32,6 +32,7 @@ html, body {
     flex: 2;
     overflow-y: auto;
     padding: 8px;
+    padding-top: 0px;
     border-right: 1px solid #ddd;
     position: relative; /* Add this to establish positioning context */
 }
@@ -42,6 +43,7 @@ html, body {
     top: 0;
     background-color: white;
     z-index: 10;
+    padding-top: 8px;
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
     margin-bottom: 10px;
