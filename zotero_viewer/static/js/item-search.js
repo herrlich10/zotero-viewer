@@ -88,20 +88,29 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
-        // Collect all tags from visible items
+        // Collect all tags from visible items and count their occurrences
         const visibleTags = new Set();
+        const tagCounts = {};
+        
         visibleItems.forEach(item => {
             const tagElements = item.querySelectorAll('.item-tags .tag');
             tagElements.forEach(tagEl => {
                 // Get only the text content of the tag, excluding the close button
                 const tagText = tagEl.childNodes[0].textContent.trim();
                 visibleTags.add(tagText);
+                
+                // Count occurrences of each tag
+                if (!tagCounts[tagText]) {
+                    tagCounts[tagText] = 1;
+                } else {
+                    tagCounts[tagText]++;
+                }
             });
         });
         
-        // Call the global function to update tag cloud visibility
+        // Call the global function to update tag cloud visibility with counts
         if (typeof updateTagCloudVisibility === 'function') {
-            updateTagCloudVisibility(visibleTags);
+            updateTagCloudVisibility(visibleTags, tagCounts);
         }
     }
     

@@ -244,7 +244,7 @@ function initializeTagFilterAndSort() {
 }
 
 // New function to update tag cloud visibility based on visible items
-function updateTagCloudVisibility(visibleTags) {
+function updateTagCloudVisibility(visibleTags, tagCounts) {
     const tagCloud = document.getElementById('tag-cloud');
     if (!tagCloud) return;
     
@@ -261,6 +261,12 @@ function updateTagCloudVisibility(visibleTags) {
             tagEl.style.display = '';
             tagEl.removeAttribute('data-hidden-by-search');
             visibleTagCount++;
+            
+            // Update the tag count to reflect visible items
+            if (tagCounts && tagCounts[tagName] !== undefined) {
+                // Make sure we're only setting the tag name once with the count
+                tagEl.textContent = `${tagName} (${tagCounts[tagName]})`;
+            }
         } else {
             tagEl.style.display = 'none';
             tagEl.setAttribute('data-hidden-by-search', 'true');
@@ -281,6 +287,13 @@ function resetTagCloudVisibility() {
     tagElements.forEach(tagEl => {
         tagEl.style.display = '';
         tagEl.removeAttribute('data-hidden-by-search');
+        
+        // Restore original count from data-count attribute
+        const tagName = tagEl.textContent.replace(/\s*\(\d+\)$/, '');
+        const originalCount = tagEl.getAttribute('data-count');
+        if (originalCount) {
+            tagEl.textContent = `${tagName} (${originalCount})`;
+        }
     });
     
     // Re-apply any existing tag filter
