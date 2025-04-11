@@ -59,7 +59,8 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Function to sort the items
     function sortItems(field, direction) {
-        const itemsContainer = document.querySelector('.main-content');
+        // const itemsContainer = document.querySelector('.main-content');
+        const itemsContainer = document.querySelector('.items-container');
         const items = Array.from(document.querySelectorAll('.item'));
         
         items.sort((a, b) => {

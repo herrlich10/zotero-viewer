@@ -30,27 +30,25 @@ html, body {
 /* Main content area */
 .main-content { 
     flex: 2;
-    overflow-y: auto;
+    overflow-y: hidden; /* Changed from auto to hidden */
     padding: 8px;
-    padding-top: 0px;
     border-right: 1px solid #ddd;
-    position: relative; /* Add this to establish positioning context */
+    display: flex;
+    flex-direction: column;
 }
 
-/* Add this new section for the sticky controls */
+/* Reference controls */
 .reference-controls {
-    position: sticky;
-    top: 0;
-    background-color: white;
-    z-index: 10;
-    padding-top: 8px;
+    flex-shrink: 0; /* Prevent controls from shrinking */
     padding-bottom: 10px;
     border-bottom: 1px solid #eee;
     margin-bottom: 10px;
 }
 
-/* Add a little padding to the items container */
+/* Items container */
 .items-container {
+    flex: 1; /* Take remaining space */
+    overflow-y: auto; /* Make this container scrollable */
     padding-top: 5px;
 }
 
