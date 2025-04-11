@@ -177,27 +177,44 @@ function initializeTagFilterAndSort() {
     newTagFilter.addEventListener('input', function() {
         const filterText = this.value.toLowerCase();
         
-        tags.forEach(tag => {
-            const tagText = tag.textContent.toLowerCase();
-            if (tagText.includes(filterText)) {
+        // Get all tags that aren't hidden by search
+        const availableTags = Array.from(tagCloud.getElementsByClassName('tag')).filter(tag => 
+            !tag.hasAttribute('data-hidden-by-search')
+        );
+        
+        // If filter is empty, show all available tags
+        if (!filterText) {
+            availableTags.forEach(tag => {
                 tag.style.display = '';
-                // Highlight matching part
-                if (filterText) {
+                tag.classList.remove('tag-highlight');
+            });
+        } else {
+            // Apply filter to available tags
+            availableTags.forEach(tag => {
+                const tagText = tag.textContent.toLowerCase();
+                if (tagText.includes(filterText)) {
+                    tag.style.display = '';
                     tag.classList.add('tag-highlight');
                 } else {
-                    tag.classList.remove('tag-highlight');
+                    tag.style.display = 'none';
                 }
-            } else {
-                tag.style.display = 'none';
-            }
-        });
+            });
+        }
+        
+        // Update tag count to show only visible tags after filtering
+        updateVisibleTagCount();
     });
     
     // Sort tags
     newTagSort.addEventListener('change', function() {
         const sortMethod = this.value;
         
-        tags.sort((a, b) => {
+        // Only sort tags that are currently visible
+        const visibleTags = Array.from(tags).filter(tag => 
+            tag.style.display !== 'none' || tag.style.display === ''
+        );
+        
+        visibleTags.sort((a, b) => {
             if (sortMethod === 'alpha') {
                 // Sort alphabetically
                 return a.textContent.localeCompare(b.textContent);
@@ -210,7 +227,7 @@ function initializeTagFilterAndSort() {
         });
         
         // Re-append sorted tags
-        tags.forEach(tag => {
+        visibleTags.forEach(tag => {
             tagCloud.appendChild(tag);
         });
     });
@@ -224,6 +241,78 @@ function initializeTagFilterAndSort() {
     // Preserve the current sort method
     newTagSort.value = tagSort.value;
     newTagSort.dispatchEvent(new Event('change'));
+}
+
+// New function to update tag cloud visibility based on visible items
+function updateTagCloudVisibility(visibleTags) {
+    const tagCloud = document.getElementById('tag-cloud');
+    if (!tagCloud) return;
+    
+    const tagElements = tagCloud.querySelectorAll('.tag');
+    let visibleTagCount = 0;
+    
+    tagElements.forEach(tagEl => {
+        // Extract tag name (without the count)
+        const tagText = tagEl.textContent.trim();
+        const tagName = tagText.replace(/\s*\(\d+\)$/, '');
+        
+        // Show/hide based on whether this tag is in the visible tags set
+        if (visibleTags.has(tagName)) {
+            tagEl.style.display = '';
+            tagEl.removeAttribute('data-hidden-by-search');
+            visibleTagCount++;
+        } else {
+            tagEl.style.display = 'none';
+            tagEl.setAttribute('data-hidden-by-search', 'true');
+        }
+    });
+    
+    // Update tag count after search filtering
+    updateVisibleTagCount();
+}
+
+// New function to reset tag cloud visibility (show all tags)
+function resetTagCloudVisibility() {
+    const tagCloud = document.getElementById('tag-cloud');
+    if (!tagCloud) return;
+    
+    const tagElements = tagCloud.querySelectorAll('.tag');
+    
+    tagElements.forEach(tagEl => {
+        tagEl.style.display = '';
+        tagEl.removeAttribute('data-hidden-by-search');
+    });
+    
+    // Re-apply any existing tag filter
+    const tagFilter = document.getElementById('tag-filter');
+    if (tagFilter && tagFilter.value) {
+        const filterText = tagFilter.value.toLowerCase();
+        
+        tagElements.forEach(tag => {
+            const tagText = tag.textContent.toLowerCase();
+            if (!tagText.includes(filterText)) {
+                tag.style.display = 'none';
+            }
+        });
+    }
+    
+    // Update tag count after resetting visibility
+    updateVisibleTagCount();
+}
+
+// New function to update the visible tag count
+function updateVisibleTagCount() {
+    const tagCloud = document.getElementById('tag-cloud');
+    if (!tagCloud) return;
+    
+    const visibleTags = Array.from(tagCloud.querySelectorAll('.tag')).filter(tag => 
+        tag.style.display !== 'none'
+    );
+    
+    const tagCountElement = document.getElementById('tag-count');
+    if (tagCountElement) {
+        tagCountElement.textContent = visibleTags.length;
+    }
 }
 
 // Function to handle the select all checkbox functionality
@@ -329,52 +418,6 @@ function initializeSelectAllCheckbox() {
     
     // Initialize the state
     updateSelectAllCheckbox();
-}
-
-// New function to update tag cloud visibility based on visible items
-function updateTagCloudVisibility(visibleTags) {
-    const tagCloud = document.getElementById('tag-cloud');
-    if (!tagCloud) return;
-    
-    const tagElements = tagCloud.querySelectorAll('.tag');
-    
-    tagElements.forEach(tagEl => {
-        // Extract tag name (without the count)
-        const tagText = tagEl.textContent.trim();
-        const tagName = tagText.replace(/\s*\(\d+\)$/, '');
-        
-        // Show/hide based on whether this tag is in the visible tags set
-        if (visibleTags.has(tagName)) {
-            tagEl.style.display = '';
-        } else {
-            tagEl.style.display = 'none';
-        }
-    });
-}
-
-// New function to reset tag cloud visibility (show all tags)
-function resetTagCloudVisibility() {
-    const tagCloud = document.getElementById('tag-cloud');
-    if (!tagCloud) return;
-    
-    const tagElements = tagCloud.querySelectorAll('.tag');
-    
-    tagElements.forEach(tagEl => {
-        tagEl.style.display = '';
-    });
-    
-    // Re-apply any existing tag filter
-    const tagFilter = document.getElementById('tag-filter');
-    if (tagFilter && tagFilter.value) {
-        const filterText = tagFilter.value.toLowerCase();
-        
-        tagElements.forEach(tag => {
-            const tagText = tag.textContent.toLowerCase();
-            if (!tagText.includes(filterText)) {
-                tag.style.display = 'none';
-            }
-        });
-    }
 }
 
 // Add this single consolidated DOMContentLoaded event listener at the end of the file:

@@ -85,9 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (typeof resetTagCloudVisibility === 'function') {
                 resetTagCloudVisibility();
             }
-            
-            // Reset tag count to original value
-            updateTagCount(document.querySelectorAll('#tag-cloud .tag').length);
             return;
         }
         
@@ -105,9 +102,6 @@ document.addEventListener('DOMContentLoaded', function() {
         // Call the global function to update tag cloud visibility
         if (typeof updateTagCloudVisibility === 'function') {
             updateTagCloudVisibility(visibleTags);
-            
-            // Update the tag count to show only visible tags
-            updateTagCount(visibleTags.size);
         }
     }
     
