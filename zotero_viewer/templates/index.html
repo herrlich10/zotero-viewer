@@ -3,33 +3,6 @@
   <head>
     <title>Zotero Viewer</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
-    <!-- Keep only the validateSelection function in the head -->
-    <script>
-      function validateSelection() {
-        const checked = document.querySelectorAll('input[name="selected_items"]:checked');
-        console.log("Selected checkboxes:", checked);
-        console.log("Number of selected items:", checked.length);
-        
-        // Log the values of selected checkboxes
-        const selectedValues = Array.from(checked).map(checkbox => checkbox.value);
-        console.log("Selected values:", selectedValues);
-        
-        if (checked.length === 0) {
-          alert('Please select at least one item');
-          return false;
-        }
-        
-        // Add a hidden field with selected values for debugging
-        const form = document.querySelector('.bulk-tag-form');
-        const debugField = document.createElement('input');
-        debugField.type = 'hidden';
-        debugField.name = 'debug_selected';
-        debugField.value = JSON.stringify(selectedValues);
-        form.appendChild(debugField);
-        
-        return true;
-      }
-    </script>
   </head>
   <body>
     <!-- Add flash messages display at the top of the template -->
