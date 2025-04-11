@@ -258,8 +258,9 @@ input[type="text"] {
 }
 
 /* Tag cloud container */
+/* Tag cloud container */
 .tag-cloud-container {
-    max-height: 400px;
+    max-height: calc(100vh - 200px); /* Changed from 400px to be responsive to viewport height */
     overflow-y: auto;
     border: 1px solid #eee;
     border-radius: 5px;
@@ -457,10 +458,6 @@ input[type="text"] {
     justify-content: space-between;
     align-items: center;
     margin-bottom: 5px;
-}
-
-.tag-header h3 {
-    margin: 0;
 }
 
 .tag-count {
