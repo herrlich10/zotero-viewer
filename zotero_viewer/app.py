@@ -781,5 +781,22 @@ def main(database, host, port, debug):
     # Run the Flask app
     app.run(host=host, port=port, debug=debug)
 
+@app.route('/api/tags')
+def get_all_tags():
+    """API endpoint to get all tags from the database"""
+    # Get all unique tags from the database
+    all_tags = set()
+    
+    # Extract tags from the already loaded items
+    for item in all_items:
+        if 'tags' in item:
+            for tag in item['tags']:
+                all_tags.add(tag)
+    
+    # Sort tags alphabetically
+    sorted_tags = sorted(list(all_tags))
+    
+    return jsonify({'tags': sorted_tags})
+
 if __name__ == '__main__':
     main()

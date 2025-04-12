@@ -5,17 +5,22 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (!tagInput || !tagSuggestions) return;
     
-    // Get all existing tags from the tag cloud
-    function getAllTags() {
-        const tagCloud = document.getElementById('tag-cloud');
-        if (!tagCloud) return [];
-        
-        const tagElements = tagCloud.querySelectorAll('.tag');
-        return Array.from(tagElements).map(tag => {
-            // Extract tag name without the count
-            const tagText = tag.textContent.trim();
-            return tagText.replace(/\s*\(\d+\)$/, '');
-        });
+    // Store all tags from the database
+    let allTags = [];
+    
+    // Fetch all tags from the server when the page loads
+    fetchAllTags();
+    
+    // Function to fetch all tags from the server
+    function fetchAllTags() {
+        fetch('/api/tags')
+            .then(response => response.json())
+            .then(data => {
+                allTags = data.tags;
+            })
+            .catch(error => {
+                console.error('Error fetching tags:', error);
+            });
     }
     
     // Current input state
@@ -32,9 +37,6 @@ document.addEventListener('DOMContentLoaded', function() {
             tagSuggestions.style.display = 'none';
             return;
         }
-        
-        // Get all tags
-        const allTags = getAllTags();
         
         // Filter tags that match the input
         const matchingTags = allTags.filter(tag => 
