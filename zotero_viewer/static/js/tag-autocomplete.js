@@ -39,10 +39,13 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         
         // Filter tags that match the input
-        const matchingTags = allTags.filter(tag => 
-            tag.toLowerCase().includes(input.toLowerCase()) && 
-            tag.toLowerCase() !== input.toLowerCase() // Don't suggest exact matches
-        );
+        const inputLower = input.toLowerCase().trim();
+        const matchingTags = allTags.filter(tag => {
+            const tagLower = tag.toLowerCase();
+            // Include tag if it contains the input text but is not an exact case-insensitive match
+            // Don't suggest exact matches
+            return tagLower.includes(inputLower) && tag !== input;
+        });
         
         // If no matches, hide suggestions
         if (matchingTags.length === 0) {
