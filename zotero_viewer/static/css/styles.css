@@ -197,6 +197,48 @@ html, body {
     display: flex;
     gap: 10px;
     margin-bottom: 10px;
+    width: 100%;
+}
+
+/* Tag input container and suggestions */
+.tag-input-container {
+    position: relative;
+    flex: 1;
+    width: 100%;
+}
+
+.tag-input-container input[type="text"] {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.tag-suggestions {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    max-height: 200px;
+    overflow-y: auto;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-top: none;
+    border-radius: 0 0 4px 4px;
+    z-index: 1000;
+    display: none;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.tag-suggestion {
+    padding: 8px 12px;
+    cursor: pointer;
+}
+
+.tag-suggestion:hover {
+    background-color: #f5f5f5;
+}
+
+.tag-suggestion.selected {
+    background-color: #e0f0ff;
 }
 
 /* Common tags container */

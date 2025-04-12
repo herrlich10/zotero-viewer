@@ -73,7 +73,10 @@
           <!-- Find the form for adding tags and add an ID -->
           <form method="post" id="add-tag-form">
             <div class="bulk-controls">
-              <input type="text" name="new_tag" placeholder="Add tags (separate with comma or semicolon)" required>
+              <div class="tag-input-container">
+                <input type="text" name="new_tag" id="new-tag-input" placeholder="Add tags (separate with comma or semicolon)" required>
+                <div id="tag-suggestions" class="tag-suggestions"></div>
+              </div>
               <button type="submit" class="add-tag-button">
                 Add Tags to Selected
               </button>
@@ -181,5 +184,6 @@
     <script src="{{ url_for('static', filename='js/item-details.js') }}"></script>
     <script src="{{ url_for('static', filename='js/item-sorter.js') }}"></script>
     <script src="{{ url_for('static', filename='js/item-search.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/tag-autocomplete.js') }}"></script>
   </body>
 </html>

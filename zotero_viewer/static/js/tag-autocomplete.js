@@ -1,0 +1,203 @@
+// Tag autocomplete functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const tagInput = document.getElementById('new-tag-input');
+    const tagSuggestions = document.getElementById('tag-suggestions');
+    
+    if (!tagInput || !tagSuggestions) return;
+    
+    // Get all existing tags from the tag cloud
+    function getAllTags() {
+        const tagCloud = document.getElementById('tag-cloud');
+        if (!tagCloud) return [];
+        
+        const tagElements = tagCloud.querySelectorAll('.tag');
+        return Array.from(tagElements).map(tag => {
+            // Extract tag name without the count
+            const tagText = tag.textContent.trim();
+            return tagText.replace(/\s*\(\d+\)$/, '');
+        });
+    }
+    
+    // Current input state
+    let currentInput = '';
+    let selectedSuggestionIndex = -1;
+    
+    // Show suggestions based on current input
+    function showSuggestions(input) {
+        // Clear previous suggestions
+        tagSuggestions.innerHTML = '';
+        
+        // If input is empty, hide suggestions
+        if (!input.trim()) {
+            tagSuggestions.style.display = 'none';
+            return;
+        }
+        
+        // Get all tags
+        const allTags = getAllTags();
+        
+        // Filter tags that match the input
+        const matchingTags = allTags.filter(tag => 
+            tag.toLowerCase().includes(input.toLowerCase()) && 
+            tag.toLowerCase() !== input.toLowerCase() // Don't suggest exact matches
+        );
+        
+        // If no matches, hide suggestions
+        if (matchingTags.length === 0) {
+            tagSuggestions.style.display = 'none';
+            return;
+        }
+        
+        // Add matching tags to suggestions
+        matchingTags.forEach((tag, index) => {
+            const suggestion = document.createElement('div');
+            suggestion.className = 'tag-suggestion';
+            suggestion.textContent = tag;
+            suggestion.dataset.index = index;
+            
+            suggestion.addEventListener('click', function() {
+                applySuggestion(tag);
+            });
+            
+            tagSuggestions.appendChild(suggestion);
+        });
+        
+        // Show suggestions
+        tagSuggestions.style.display = 'block';
+        selectedSuggestionIndex = -1;
+    }
+    
+    // Apply the selected suggestion
+    function applySuggestion(suggestion) {
+        // Get current input value
+        const inputValue = tagInput.value;
+        
+        // Find the position of the last delimiter
+        const lastCommaPos = inputValue.lastIndexOf(',');
+        const lastSemicolonPos = inputValue.lastIndexOf(';');
+        const lastDelimiterPos = Math.max(lastCommaPos, lastSemicolonPos);
+        
+        // Determine which delimiter was used (default to comma)
+        const delimiter = lastSemicolonPos > lastCommaPos ? ';' : ',';
+        
+        // Create new input value with the suggestion
+        let newValue;
+        if (lastDelimiterPos === -1) {
+            // No delimiter, replace entire input
+            newValue = suggestion;
+        } else {
+            // Replace text after the last delimiter
+            const beforeDelimiter = inputValue.substring(0, lastDelimiterPos + 1);
+            newValue = beforeDelimiter + ' ' + suggestion;
+        }
+        
+        // Update input value
+        tagInput.value = newValue;
+        
+        // Hide suggestions
+        tagSuggestions.style.display = 'none';
+        
+        // Focus input and move cursor to end
+        tagInput.focus();
+    }
+    
+    // Handle input changes
+    tagInput.addEventListener('input', function() {
+        // Get current input value
+        const inputValue = this.value;
+        
+        // Find the position of the last delimiter
+        const lastCommaPos = inputValue.lastIndexOf(',');
+        const lastSemicolonPos = inputValue.lastIndexOf(';');
+        const lastDelimiterPos = Math.max(lastCommaPos, lastSemicolonPos);
+        
+        // Get the text after the last delimiter
+        let currentTag;
+        if (lastDelimiterPos === -1) {
+            // No delimiter, use entire input
+            currentTag = inputValue.trim();
+        } else {
+            // Use text after the last delimiter
+            currentTag = inputValue.substring(lastDelimiterPos + 1).trim();
+        }
+        
+        // Update current input
+        currentInput = currentTag;
+        
+        // Show suggestions
+        showSuggestions(currentTag);
+    });
+    
+    // Handle keyboard navigation
+    tagInput.addEventListener('keydown', function(e) {
+        // Only handle if suggestions are visible
+        if (tagSuggestions.style.display !== 'block') return;
+        
+        const suggestions = tagSuggestions.querySelectorAll('.tag-suggestion');
+        
+        switch (e.key) {
+            case 'ArrowDown':
+                e.preventDefault();
+                // Move selection down
+                selectedSuggestionIndex = Math.min(selectedSuggestionIndex + 1, suggestions.length - 1);
+                updateSelectedSuggestion();
+                break;
+                
+            case 'ArrowUp':
+                e.preventDefault();
+                // Move selection up
+                selectedSuggestionIndex = Math.max(selectedSuggestionIndex - 1, -1);
+                updateSelectedSuggestion();
+                break;
+                
+            case 'Enter':
+                // If a suggestion is selected, apply it
+                if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
+                    e.preventDefault();
+                    applySuggestion(suggestions[selectedSuggestionIndex].textContent);
+                }
+                break;
+                
+            case 'Escape':
+                // Hide suggestions
+                tagSuggestions.style.display = 'none';
+                break;
+                
+            case 'Tab':
+                // If a suggestion is selected, apply it
+                if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
+                    e.preventDefault();
+                    applySuggestion(suggestions[selectedSuggestionIndex].textContent);
+                } else if (suggestions.length > 0) {
+                    // Apply first suggestion if none selected
+                    e.preventDefault();
+                    applySuggestion(suggestions[0].textContent);
+                }
+                break;
+        }
+    });
+    
+    // Update the selected suggestion
+    function updateSelectedSuggestion() {
+        const suggestions = tagSuggestions.querySelectorAll('.tag-suggestion');
+        
+        // Remove selected class from all suggestions
+        suggestions.forEach(suggestion => {
+            suggestion.classList.remove('selected');
+        });
+        
+        // Add selected class to current selection
+        if (selectedSuggestionIndex >= 0 && selectedSuggestionIndex < suggestions.length) {
+            suggestions[selectedSuggestionIndex].classList.add('selected');
+            // Ensure the selected suggestion is visible
+            suggestions[selectedSuggestionIndex].scrollIntoView({ block: 'nearest' });
+        }
+    }
+    
+    // Hide suggestions when clicking outside
+    document.addEventListener('click', function(e) {
+        if (!tagInput.contains(e.target) && !tagSuggestions.contains(e.target)) {
+            tagSuggestions.style.display = 'none';
+        }
+    });
+});
