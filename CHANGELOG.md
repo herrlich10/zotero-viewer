@@ -1,6 +1,16 @@
 # Changelog
 
-All notable changes to ZoteroViewer will be documented in this file.
+All notable changes to Zotero Viewer will be documented in this file.
+
+## [0.1.2] - 2025-04-14
+
+### Added
+- Added a new feature to autocomplete tags when adding them to items
+- Added a new route for retrieving all existing tags (for autocompletion)
+
+### Fixed
+- Fixed an issue where the tag cloud was not updating correctly after adding or deleting tags
+
 
 ## [0.1.1] - 2025-04-11
 

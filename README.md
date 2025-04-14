@@ -12,6 +12,7 @@ While the official Zotero desktop application provides excellent reference manag
 
 Besides these, Zotero Viewer also offers standard features like:
 
+- **Tag autocompletion**: Quickly add new tags by typing and selecting from suggestions
 - **Intuitive tag filtering**: Filter your references by selecting multiple tags with AND logic
 - **Flexible sorting options**: Sort your references by title, author, year, journal, or date added
 - **Attachment handling**: Quickly access PDF attachments associated with your references
