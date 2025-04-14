@@ -500,3 +500,24 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 100);
     }
 });
+
+// Add this new function after updateTagCloud function
+function updateTagCloudWithSearchContext(tagCounts) {
+    // First, check if there's an active search
+    const searchInput = document.getElementById('item-search');
+    const hasActiveSearch = searchInput && searchInput.value.trim() !== '';
+    
+    if (hasActiveSearch) {
+        // If there's an active search, we need to filter the tag counts
+        // to only include tags from visible items
+        const visibleItems = Array.from(document.querySelectorAll('.item'))
+            .filter(item => item.style.display !== 'none');
+        
+        // Update tag cloud with visibility constraints from search
+        updateTagCloud(tagCounts);
+        updateTagCloudForVisibleItems(visibleItems);
+    } else {
+        // If no active search, just update normally
+        updateTagCloud(tagCounts);
+    }
+}

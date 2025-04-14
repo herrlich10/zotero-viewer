@@ -99,7 +99,7 @@ function addTagsToSelected(event) {
             
             // Update the tag cloud with new counts
             if (data.tag_counts) {
-                updateTagCloud(data.tag_counts);
+                updateTagCloudWithSearchContext(data.tag_counts);
             }
             
             // Add the new tags to each selected item in the DOM
@@ -222,7 +222,7 @@ function removeTag(tagName, itemId, event) {
             
             // Update the tag cloud with new counts
             if (data.tag_counts) {
-                updateTagCloud(data.tag_counts);
+                updateTagCloudWithSearchContext(data.tag_counts);
             }
             
             // Update common tags if this item is selected
@@ -355,7 +355,7 @@ function removeTagFromSelected(tagName) {
             
             // Update the tag cloud with new counts
             if (data.tag_counts) {
-                updateTagCloud(data.tag_counts);
+                updateTagCloudWithSearchContext(data.tag_counts);
             }
             
             // Update the item details panel if the currently highlighted item is one of the selected items
