@@ -2,9 +2,15 @@ from setuptools import setup, find_packages
 import os
 from zotero_viewer import __version__
 
-# Read the long description from README.md
-with open("README.md", "r", encoding="utf-8") as fh:
-    long_description = fh.read()
+# Read the contents of README.md and CHANGELOG.md
+with open('README.md', 'r', encoding='utf-8') as f:
+    readme = f.read()
+
+with open('CHANGELOG.md', 'r', encoding='utf-8') as f:
+    changelog = f.read()
+
+# Combine README and CHANGELOG for the long description
+long_description = readme + '\n\n' + changelog
 
 setup(
     name="zotero-viewer",

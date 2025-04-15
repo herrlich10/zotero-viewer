@@ -2,6 +2,12 @@
 
 All notable changes to Zotero Viewer will be documented in this file.
 
+## [0.1.3] - 2025-04-15
+
+### Changed
+- Excluded notes and annotations from displaying in the reference list
+
+
 ## [0.1.2] - 2025-04-14
 
 ### Added
@@ -21,6 +27,7 @@ All notable changes to Zotero Viewer will be documented in this file.
 
 ### Changed
 - Default sorting order changed to most recent first
+
 
 ## [0.1.0] - 2025-04-10
 
