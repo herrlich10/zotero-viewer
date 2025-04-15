@@ -10,12 +10,13 @@ While the official Zotero desktop application provides excellent reference manag
 - **Hierachial tags support**: The parent tag auto-addition approach provides hierarchical tags support even back in the native Zotero app
 - **Powerful search capabilities**: Search across titles, authors, abstracts, and tags with fine-grained control
 
-Besides these, Zotero Viewer also offers standard features like:
+Besides these, Zotero Viewer also offers:
 
 - **Tag autocompletion**: Quickly add new tags by typing and selecting from suggestions
-- **Intuitive tag filtering**: Filter your references by selecting multiple tags with AND logic
+- **Tag counts display**: View the number of references associated with each tag in current scope
+- **Tag filters bookmark**: Save the URL with current tag filters for quick access
 - **Flexible sorting options**: Sort your references by title, author, year, journal, or date added
-- **Attachment handling**: Quickly access PDF attachments associated with your references
+- **Attachment handling**: Quickly access PDF attachments associated with your references (still under development, may not work at present)
 - **Clean, responsive interface**: Browse your references in a modern web interface
 
 ## What Zotero Viewer Cannot Do
