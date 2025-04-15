@@ -24,6 +24,8 @@ def get_items_and_tags(connection):
     query = """
     SELECT
         items.itemID,
+        items.itemTypeID,
+        itemTypes.typeName,
         itemDataValues.value AS title,
         dateValues.value AS date,
         items.dateAdded,
@@ -31,6 +33,7 @@ def get_items_and_tags(connection):
         abstractValues.value AS abstract,
         tags.name AS tag
     FROM items
+    LEFT JOIN itemTypes ON items.itemTypeID = itemTypes.itemTypeID
     LEFT JOIN itemData ON items.itemID = itemData.itemID
     LEFT JOIN fields ON itemData.fieldID = fields.fieldID
     LEFT JOIN itemDataValues ON itemData.valueID = itemDataValues.valueID
@@ -49,7 +52,7 @@ def get_items_and_tags(connection):
     LEFT JOIN itemData abstractData ON items.itemID = abstractData.itemID AND abstractData.fieldID = 90
     LEFT JOIN itemDataValues abstractValues ON abstractData.valueID = abstractValues.valueID
     
-    WHERE items.itemTypeID != 14  -- Exclude attachments
+    WHERE items.itemTypeID != 14 and items.itemTypeID != 1 and items.itemTypeID != 37  -- Exclude attachments, notes, and annotations
     AND (fields.fieldName = 'title' OR fields.fieldName IS NULL)
     """
     cursor.execute(query)
@@ -83,6 +86,8 @@ def get_items_and_tags(connection):
             
             items_dict[item_id] = {
                 'id': item_id,
+                'typeID': row['itemTypeID'],
+                'typeName': row['typeName'] or 'Unknown Type',
                 'title': row['title'] or 'Untitled',
                 'author': [],  # Initialize as empty list to store multiple authors
                 'date': date or 'No date',
@@ -105,7 +110,7 @@ def get_items_and_tags(connection):
     JOIN itemCreators ON items.itemID = itemCreators.itemID
     JOIN creators ON itemCreators.creatorID = creators.creatorID
     JOIN creatorTypes ON itemCreators.creatorTypeID = creatorTypes.creatorTypeID
-    WHERE items.itemTypeID != 14  -- Exclude attachments
+    WHERE items.itemTypeID != 14 and items.itemTypeID != 1 and items.itemTypeID != 37  -- Exclude attachments, notes, and annotations
     ORDER BY items.itemID, itemCreators.orderIndex
     """
     cursor.execute(author_query)
